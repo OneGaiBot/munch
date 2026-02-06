@@ -227,6 +227,14 @@ async function openRecipe(id) {
   
   modal.classList.remove('hidden');
   document.body.classList.add('modal-open');
+  
+  // Prevent scrolling background when modal is open
+  const modalBodyScroll = document.querySelector('.modal-body-scroll');
+  if (modalBodyScroll) {
+    modalBodyScroll.addEventListener('touchmove', (e) => {
+      e.stopPropagation();
+    }, { passive: true });
+  }
 }
 
 // Adjust servings
@@ -370,6 +378,14 @@ modal.addEventListener('click', (e) => {
     document.body.classList.remove('modal-open');
   }
 });
+
+// Prevent background scrolling when touching modal content
+const modalContent = document.querySelector('.modal-content');
+if (modalContent) {
+  modalContent.addEventListener('touchmove', (e) => {
+    e.stopPropagation();
+  }, { passive: false });
+}
 
 // ESC key to close modals
 document.addEventListener('keydown', (e) => {

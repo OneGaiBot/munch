@@ -261,6 +261,8 @@ select:focus, #search:focus {
   padding: 1rem;
   z-index: 100;
   overflow-y: auto;
+  touch-action: manipulation;
+  overscroll-behavior: contain;
 }
 
 .modal.hidden {
@@ -343,6 +345,7 @@ select:focus, #search:focus {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   max-height: calc(100vh - 200px);
+  overscroll-behavior: contain;
 }
 
 .modal-section {
@@ -446,6 +449,8 @@ select:focus, #search:focus {
   gap: 0.75rem;
   padding: 1rem 1.5rem;
   border-top: 1px solid var(--border);
+  flex-shrink: 0;
+  background: var(--surface);
 }
 
 .btn {
@@ -1129,6 +1134,17 @@ select:focus, #search:focus {
     -webkit-overflow-scrolling: touch;
     flex: 1;
     min-height: 0;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+  }
+
+  .modal-actions {
+    padding: 1rem;
+    flex-shrink: 0;
+    position: sticky;
+    bottom: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
   }
 
   .modal-actions {
