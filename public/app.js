@@ -35,6 +35,17 @@ const cuisineEmoji = {
   'International': '🌍'
 };
 
+// Emoji map for equipment
+const equipmentEmoji = {
+  'airfryer': '🍟',
+  'wok': '🥘',
+  'blender': '🫙',
+  'pot': '🍲',
+  'pan': '🍳',
+  'small pan': '🍳',
+  'oven': '♨️'
+};
+
 // Tab switching
 tabs.forEach(tab => {
   tab.addEventListener('click', () => {
@@ -97,9 +108,9 @@ function renderRecipes(container = recipeGrid, data = recipes) {
         <h3 class="card-title">${r.name}</h3>
         <p class="card-description">${r.description}</p>
         <div class="card-meta">
-          <span>⏱️ ${r.duration} min</span>
+          <span class="time">⏱️ ${r.duration} min</span>
           <span class="tag cuisine">${r.cuisine}</span>
-          ${r.equipment?.includes('airfryer') ? '<span class="tag">🍟 Airfryer</span>' : ''}
+          ${(r.equipment || []).map(eq => `<span class="tag equipment">${equipmentEmoji[eq] || '🍳'} ${eq}</span>`).join('')}
         </div>
       </div>
     </div>
@@ -145,7 +156,7 @@ async function openRecipe(id) {
       <div class="modal-meta">
         <span class="tag cuisine">${recipe.cuisine}</span>
         <span class="tag">⏱️ ${recipe.duration} min</span>
-        ${recipe.equipment?.map(e => `<span class="tag">${e}</span>`).join('') || ''}
+        ${(recipe.equipment || []).map(e => `<span class="tag equipment">${equipmentEmoji[e] || '🍳'} ${e}</span>`).join('')}
       </div>
     </div>
     <div class="modal-body">
