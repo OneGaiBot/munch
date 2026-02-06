@@ -228,6 +228,9 @@ async function openRecipe(id) {
   modal.classList.remove('hidden');
   document.body.classList.add('modal-open');
   
+  // Handle iOS Safari viewport height changes
+  updateModalHeight();
+  
   // Prevent scrolling background when modal is open
   const modalBodyScroll = document.querySelector('.modal-body-scroll');
   if (modalBodyScroll) {
@@ -691,6 +694,25 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// Handle iOS Safari viewport changes
+function updateModalHeight() {
+  if (window.visualViewport) {
+    const height = window.visualViewport.height;
+    document.documentElement.style.setProperty('--actual-vh', `${height}px`);
+  } else {
+    document.documentElement.style.setProperty('--actual-vh', `${window.innerHeight}px`);
+  }
+}
+
+// Listen for viewport changes (Safari address bar)
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', updateModalHeight);
+}
+window.addEventListener('resize', updateModalHeight);
+
 // Init
-loadCuisines();
-fetchRecipes();
+document.addEventListener('DOMContentLoaded', () => {
+  updateModalHeight();
+  loadCuisines();
+  fetchRecipes();
+});

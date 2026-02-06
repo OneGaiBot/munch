@@ -345,6 +345,8 @@ select:focus, #search:focus {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   max-height: calc(100vh - 200px);
+  max-height: calc(var(--actual-vh, 100vh) - 200px);
+  max-height: calc(100dvh - 200px);
   overscroll-behavior: contain;
 }
 
@@ -1108,16 +1110,24 @@ select:focus, #search:focus {
     left: 0;
     right: 0;
     bottom: 0;
+    height: 100vh;
+    height: var(--actual-vh, 100vh);
+    height: 100dvh; /* Dynamic viewport height for iOS Safari */
   }
 
   .modal-content {
     border-radius: 0;
     max-height: 100vh;
+    max-height: var(--actual-vh, 100vh);
+    max-height: 100dvh;
     height: 100vh;
+    height: var(--actual-vh, 100vh);
+    height: 100dvh;
     max-width: 100%;
     margin: 0;
     overflow: hidden;
     position: relative;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
   .modal-header {
@@ -1140,11 +1150,13 @@ select:focus, #search:focus {
 
   .modal-actions {
     padding: 1rem;
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
     flex-shrink: 0;
     position: sticky;
     bottom: 0;
     background: var(--surface);
     border-top: 1px solid var(--border);
+    min-height: calc(4rem + env(safe-area-inset-bottom, 0px));
   }
 
   .modal-actions {
