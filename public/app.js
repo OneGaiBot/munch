@@ -210,6 +210,11 @@ async function openRecipe(id) {
           `).join('')}
         </ol>
       </div>
+      <div class="modal-section">
+        <h3>Notes</h3>
+        <textarea id="recipe-comments" placeholder="Add your cooking notes... (e.g., needs more salt, perfect timing, etc.)">${recipe.comments || ''}</textarea>
+        <button class="btn btn-secondary save-comments-btn" onclick="saveComments(${recipe.id})" style="margin-top: 0.5rem;">💾 Save Notes</button>
+      </div>
     </div>
     <div class="modal-actions">
       <button class="btn btn-heart ${recipe.isFavorite ? 'active' : ''}" onclick="toggleFavoriteModal(${recipe.id})">
@@ -296,6 +301,31 @@ async function addToShoppingList(recipeId) {
   if (res.ok) {
     const { added } = await res.json();
     alert(`Added ${added} ingredients to your shopping list!`);
+  }
+}
+
+// Save recipe comments
+async function saveComments(recipeId) {
+  const commentsTextarea = document.getElementById('recipe-comments');
+  const comments = commentsTextarea.value.trim();
+  
+  const res = await fetch(`/api/recipes/${recipeId}/comments`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ comments: comments || null })
+  });
+  
+  if (res.ok) {
+    const btn = document.querySelector('.save-comments-btn');
+    const originalText = btn.textContent;
+    btn.textContent = '✅ Saved!';
+    btn.style.background = 'var(--success)';
+    setTimeout(() => {
+      btn.textContent = originalText;
+      btn.style.background = '';
+    }, 1500);
+  } else {
+    alert('Failed to save comments');
   }
 }
 

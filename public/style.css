@@ -360,6 +360,31 @@ select:focus, #search:focus {
   color: var(--accent);
 }
 
+#recipe-comments {
+  width: 100%;
+  min-height: 80px;
+  padding: 0.75rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  resize: vertical;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#recipe-comments:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+#recipe-comments::placeholder {
+  color: var(--text-muted);
+}
+
 .source-link {
   font-size: 0.85rem;
   color: var(--text-muted);
@@ -1170,7 +1195,8 @@ select:focus, #search:focus {
 
   .form-group input,
   .form-group select,
-  .form-group textarea {
+  .form-group textarea,
+  #recipe-comments {
     font-size: 16px; /* Prevent zoom on iOS */
   }
 

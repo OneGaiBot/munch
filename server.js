@@ -52,6 +52,9 @@ try {
 try {
   db.exec(`ALTER TABLE recipes ADD COLUMN source TEXT DEFAULT 'onegai'`);
 } catch (e) { /* column exists */ }
+try {
+  db.exec(`ALTER TABLE recipes ADD COLUMN comments TEXT`);
+} catch (e) { /* column exists */ }
 
 // Set source for existing recipes
 db.exec(`UPDATE recipes SET source = 'onegai' WHERE source IS NULL AND custom = 0`);
@@ -302,6 +305,19 @@ app.delete('/api/shopping-list', (req, res) => {
     db.prepare('DELETE FROM shopping_list').run();
   }
   res.status(204).send();
+});
+
+// Update recipe comments
+app.patch('/api/recipes/:id/comments', (req, res) => {
+  const { id } = req.params;
+  const { comments } = req.body;
+  
+  if (comments !== null && comments !== undefined && typeof comments !== 'string') {
+    return res.status(400).json({ error: 'Comments must be a string' });
+  }
+  
+  db.prepare('UPDATE recipes SET comments = ? WHERE id = ?').run(comments || null, id);
+  res.json({ ok: true });
 });
 
 // Start server
