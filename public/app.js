@@ -49,6 +49,22 @@ const equipmentEmoji = {
   'oven': '♨️'
 };
 
+// Source badges
+const sourceBadge = {
+  'onegai': '🤖 OneGai',
+  'user': '📝 Mine',
+  'themealdb': '🌐 MealDB'
+};
+
+// Helper to get domain from URL
+function getDomain(url) {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return url;
+  }
+}
+
 // Tab switching
 tabs.forEach(tab => {
   tab.addEventListener('click', () => {
@@ -69,8 +85,7 @@ async function fetchRecipes() {
   if (timeFilter.value) params.set('maxDuration', timeFilter.value);
   if (equipmentFilter.value) params.set('equipment', equipmentFilter.value);
   if (searchInput.value) params.set('search', searchInput.value);
-  if (sourceFilter.value === 'custom') params.set('custom', 'true');
-  if (sourceFilter.value === 'onegai') params.set('custom', 'false');
+  if (sourceFilter.value) params.set('source', sourceFilter.value);
 
   const res = await fetch(`/api/recipes?${params}`);
   recipes = await res.json();
@@ -103,9 +118,9 @@ function renderRecipes(container = recipeGrid, data = recipes) {
 
   container.innerHTML = data.map(r => `
     <div class="recipe-card" data-id="${r.id}">
-      <div class="card-image">
-        ${cuisineEmoji[r.cuisine] || '🍽️'}
-        <span class="source-badge ${r.isCustom ? 'custom' : 'onegai'}">${r.isCustom ? '📝 Mine' : '🤖 OneGai'}</span>
+      <div class="card-image" ${r.image ? `style="background-image: url('${r.image}'); background-size: cover; background-position: center;"` : ''}>
+        ${r.image ? '' : cuisineEmoji[r.cuisine] || '🍽️'}
+        <span class="source-badge ${r.source}">${sourceBadge[r.source] || '🍽️'}</span>
         <button class="card-favorite ${r.isFavorite ? 'active' : ''}" onclick="toggleFavorite(event, ${r.id})">
           ${r.isFavorite ? '❤️' : '🤍'}
         </button>
@@ -162,10 +177,10 @@ async function openRecipe(id) {
       <div class="modal-meta">
         <span class="tag cuisine">${recipe.cuisine}</span>
         <span class="tag">⏱️ ${recipe.duration} min</span>
-        ${recipe.isCustom ? '<span class="tag">📝 My Recipe</span>' : ''}
+        <span class="tag source-tag ${recipe.source}">${sourceBadge[recipe.source] || '🍽️'}</span>
         ${(recipe.equipment || []).map(e => `<span class="tag equipment">${equipmentEmoji[e] || '🍳'} ${e}</span>`).join('')}
       </div>
-      ${recipe.source_url ? `<p class="source-link">Source: <a href="${recipe.source_url}" target="_blank">${new URL(recipe.source_url).hostname}</a></p>` : ''}
+      ${recipe.source_url ? `<p class="source-link">Source: <a href="${recipe.source_url}" target="_blank" rel="noopener">${getDomain(recipe.source_url)}</a></p>` : ''}
     </div>
     <div class="modal-body">
       <div class="modal-section">
@@ -201,7 +216,7 @@ async function openRecipe(id) {
       <button class="btn btn-primary" onclick="addToShoppingList(${recipe.id})">
         🛒 Add to List
       </button>
-      ${recipe.isCustom ? `<button class="btn btn-danger" onclick="deleteRecipe(${recipe.id})">🗑️ Delete</button>` : ''}
+      ${recipe.source === 'user' ? `<button class="btn btn-danger" onclick="deleteRecipe(${recipe.id})">🗑️ Delete</button>` : ''}
     </div>
   `;
 

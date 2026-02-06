@@ -49,6 +49,13 @@ try {
 try {
   db.exec(`ALTER TABLE recipes ADD COLUMN source_url TEXT`);
 } catch (e) { /* column exists */ }
+try {
+  db.exec(`ALTER TABLE recipes ADD COLUMN source TEXT DEFAULT 'onegai'`);
+} catch (e) { /* column exists */ }
+
+// Set source for existing recipes
+db.exec(`UPDATE recipes SET source = 'onegai' WHERE source IS NULL AND custom = 0`);
+db.exec(`UPDATE recipes SET source = 'user' WHERE custom = 1 AND source IS NULL`);
 
 // Middleware
 app.use(express.json());
@@ -89,6 +96,11 @@ app.get('/api/recipes', (req, res) => {
     query += ' AND custom = 0';
   }
 
+  if (req.query.source) {
+    query += ' AND source = ?';
+    params.push(req.query.source);
+  }
+
   query += ' ORDER BY created_at DESC';
 
   let recipes = db.prepare(query).all(...params);
@@ -103,7 +115,8 @@ app.get('/api/recipes', (req, res) => {
     equipment: r.equipment ? JSON.parse(r.equipment) : [],
     seasonal: r.seasonal ? JSON.parse(r.seasonal) : [],
     isFavorite: favIds.includes(r.id),
-    isCustom: r.custom === 1
+    isCustom: r.custom === 1,
+    source: r.source || 'onegai'
   }));
 
   if (favorites === 'true') {
@@ -129,7 +142,8 @@ app.get('/api/recipes/:id', (req, res) => {
     equipment: recipe.equipment ? JSON.parse(recipe.equipment) : [],
     seasonal: recipe.seasonal ? JSON.parse(recipe.seasonal) : [],
     isFavorite: !!isFavorite,
-    isCustom: recipe.custom === 1
+    isCustom: recipe.custom === 1,
+    source: recipe.source || 'onegai'
   });
 });
 
@@ -155,8 +169,8 @@ app.post('/api/recipes', (req, res) => {
   }
 
   const result = db.prepare(`
-    INSERT INTO recipes (name, description, cuisine, duration, servings, equipment, ingredients, instructions, source_url, custom)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+    INSERT INTO recipes (name, description, cuisine, duration, servings, equipment, ingredients, instructions, source_url, custom, source)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 'user')
   `).run(
     name.trim(),
     description?.trim() || '',

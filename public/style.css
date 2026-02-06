@@ -710,13 +710,35 @@ select:focus, #search:focus {
   font-weight: 500;
 }
 
-.source-badge.custom {
-  background: rgba(244, 114, 182, 0.8);
+.source-badge.user {
+  background: rgba(244, 114, 182, 0.9);
+  color: white;
 }
 
 .source-badge.onegai {
-  background: rgba(45, 212, 191, 0.8);
+  background: rgba(45, 212, 191, 0.9);
   color: #0c1015;
+}
+
+.source-badge.themealdb {
+  background: rgba(251, 191, 36, 0.9);
+  color: #0c1015;
+}
+
+/* Source tag in modal */
+.source-tag.user {
+  background: rgba(244, 114, 182, 0.3);
+  color: #f472b6;
+}
+
+.source-tag.onegai {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.source-tag.themealdb {
+  background: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
 }
 
 /* Add button in filters */
