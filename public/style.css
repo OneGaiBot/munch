@@ -4,6 +4,10 @@
   box-sizing: border-box;
 }
 
+html {
+  overflow-x: hidden;
+}
+
 :root {
   --bg: #0c1015;
   --surface: #151b23;
@@ -25,6 +29,7 @@ body {
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 .app {
@@ -267,6 +272,8 @@ select:focus, #search:focus {
   overflow-y: auto;
   position: relative;
   border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
 }
 
 .modal-close {
@@ -324,6 +331,8 @@ select:focus, #search:focus {
 
 .modal-body {
   padding: 1.5rem;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .modal-section {
@@ -606,6 +615,15 @@ select:focus, #search:focus {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+.add-recipe-form .form-actions {
+  position: sticky;
+  bottom: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  margin: 0 -1rem -1rem;
+  padding: 1rem;
 }
 
 .form-group {
@@ -1020,39 +1038,90 @@ select:focus, #search:focus {
 
 /* Responsive */
 @media (max-width: 600px) {
+  .app {
+    padding: 0.5rem;
+  }
+
+  header {
+    padding: 1rem 0;
+  }
+
   header h1 {
     font-size: 2rem;
   }
 
   .tabs {
     justify-content: center;
+    margin-bottom: 1rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .tabs::-webkit-scrollbar {
+    display: none;
   }
 
   .tab {
     padding: 0.6rem 1rem;
     font-size: 0.9rem;
+    white-space: nowrap;
   }
 
   .filter-row {
     flex-direction: column;
   }
 
-  select {
+  select, #search {
     width: 100%;
+    font-size: 16px; /* Prevent zoom on iOS */
+    border-radius: 8px;
   }
 
   .recipe-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  /* Full-screen modal on mobile */
+  .modal {
+    padding: 0;
+    align-items: stretch;
+    justify-content: stretch;
   }
 
   .modal-content {
-    border-radius: 12px 12px 0 0;
-    max-height: 95vh;
-    margin-top: auto;
+    border-radius: 0;
+    max-height: 100vh;
+    height: 100vh;
+    max-width: 100%;
+    margin: 0;
+    overflow: hidden;
+  }
+
+  .modal-header {
+    flex-shrink: 0;
+  }
+
+  .modal-body {
+    padding: 1rem;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modal-actions {
+    flex-shrink: 0;
+    padding: 1rem;
   }
 
   .form-row {
     grid-template-columns: 1fr;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    font-size: 16px; /* Prevent zoom on iOS */
   }
 
   /* Mobile-friendly shopping list delete */
@@ -1073,5 +1142,24 @@ select:focus, #search:focus {
   .item-delete:active {
     background: rgba(255, 107, 107, 0.25);
     transform: scale(0.95);
+  }
+
+  /* Better mobile button spacing */
+  .btn-add,
+  .btn-shuffle {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  /* Prevent horizontal overflow on cards */
+  .recipe-card,
+  .shopping-item {
+    overflow: hidden;
+  }
+
+  /* Better touch targets */
+  .card-favorite {
+    width: 44px;
+    height: 44px;
   }
 }
