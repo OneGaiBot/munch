@@ -19,6 +19,10 @@ const searchInput = document.getElementById('search');
 const shoppingList = document.getElementById('shopping-list');
 const noShopping = document.getElementById('no-shopping');
 const noFavorites = document.getElementById('no-favorites');
+const myRecipesGrid = document.getElementById('myrecipes-grid');
+const noMyRecipes = document.getElementById('no-myrecipes');
+const addRecipeModal = document.getElementById('add-recipe-modal');
+const addRecipeForm = document.getElementById('add-recipe-form');
 
 // Emoji map for cuisines
 const cuisineEmoji = {
@@ -55,6 +59,7 @@ tabs.forEach(tab => {
     document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
     
     if (tab.dataset.tab === 'favorites') loadFavorites();
+    if (tab.dataset.tab === 'myrecipes') loadMyRecipes();
     if (tab.dataset.tab === 'shopping') loadShoppingList();
   });
 });
@@ -100,6 +105,7 @@ function renderRecipes(container = recipeGrid, data = recipes) {
     <div class="recipe-card" data-id="${r.id}">
       <div class="card-image">
         ${cuisineEmoji[r.cuisine] || '🍽️'}
+        ${r.isCustom ? '<span class="custom-badge">MY RECIPE</span>' : ''}
         <button class="card-favorite ${r.isFavorite ? 'active' : ''}" onclick="toggleFavorite(event, ${r.id})">
           ${r.isFavorite ? '❤️' : '🤍'}
         </button>
@@ -156,8 +162,10 @@ async function openRecipe(id) {
       <div class="modal-meta">
         <span class="tag cuisine">${recipe.cuisine}</span>
         <span class="tag">⏱️ ${recipe.duration} min</span>
+        ${recipe.isCustom ? '<span class="tag">📝 My Recipe</span>' : ''}
         ${(recipe.equipment || []).map(e => `<span class="tag equipment">${equipmentEmoji[e] || '🍳'} ${e}</span>`).join('')}
       </div>
+      ${recipe.source_url ? `<p class="source-link">Source: <a href="${recipe.source_url}" target="_blank">${new URL(recipe.source_url).hostname}</a></p>` : ''}
     </div>
     <div class="modal-body">
       <div class="modal-section">
@@ -349,6 +357,89 @@ let searchTimeout;
 searchInput.addEventListener('input', () => {
   clearTimeout(searchTimeout);
   searchTimeout = setTimeout(fetchRecipes, 300);
+});
+
+// Load my recipes
+async function loadMyRecipes() {
+  const res = await fetch('/api/recipes?custom=true');
+  const myRecipes = await res.json();
+  
+  if (myRecipes.length === 0) {
+    myRecipesGrid.innerHTML = '';
+    noMyRecipes.classList.remove('hidden');
+  } else {
+    noMyRecipes.classList.add('hidden');
+    renderRecipes(myRecipesGrid, myRecipes);
+  }
+}
+
+// Add recipe modal
+function openAddRecipeModal() {
+  addRecipeForm.reset();
+  addRecipeModal.classList.remove('hidden');
+}
+
+function closeAddRecipeModal() {
+  addRecipeModal.classList.add('hidden');
+}
+
+addRecipeModal.addEventListener('click', (e) => {
+  if (e.target === addRecipeModal) closeAddRecipeModal();
+});
+
+// Submit new recipe
+addRecipeForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const name = document.getElementById('recipe-name').value;
+  const description = document.getElementById('recipe-description').value;
+  const cuisine = document.getElementById('recipe-cuisine').value;
+  const duration = parseInt(document.getElementById('recipe-duration').value);
+  const servings = parseInt(document.getElementById('recipe-servings').value) || 2;
+  const source_url = document.getElementById('recipe-source').value;
+  
+  const equipment = [...document.querySelectorAll('input[name="equipment"]:checked')].map(cb => cb.value);
+  const ingredients = document.getElementById('recipe-ingredients').value.split('\n').map(s => s.trim()).filter(s => s);
+  const instructions = document.getElementById('recipe-instructions').value.split('\n').map(s => s.trim()).filter(s => s);
+  
+  if (ingredients.length === 0) {
+    alert('Please add at least one ingredient');
+    return;
+  }
+  if (instructions.length === 0) {
+    alert('Please add at least one instruction');
+    return;
+  }
+  
+  try {
+    const res = await fetch('/api/recipes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name,
+        description,
+        cuisine,
+        duration,
+        servings,
+        equipment,
+        ingredients,
+        instructions,
+        source_url: source_url || null
+      })
+    });
+    
+    if (res.ok) {
+      closeAddRecipeModal();
+      // Switch to My Recipes tab
+      document.querySelector('[data-tab="myrecipes"]').click();
+    } else {
+      const err = await res.json();
+      alert(err.error || 'Failed to save recipe');
+    }
+  } catch (err) {
+    alert('Failed to save recipe');
+    console.error(err);
+  }
 });
 
 // Init

@@ -16,6 +16,7 @@
     <nav class="tabs">
       <button class="tab active" data-tab="recipes">Recipes</button>
       <button class="tab" data-tab="favorites">Favorites</button>
+      <button class="tab" data-tab="myrecipes">My Recipes</button>
       <button class="tab" data-tab="shopping">Shopping List</button>
     </nav>
 
@@ -57,6 +58,18 @@
       </div>
     </section>
 
+    <!-- My Recipes Tab -->
+    <section id="myrecipes-tab" class="tab-content">
+      <div class="myrecipes-header">
+        <button class="btn btn-primary" onclick="openAddRecipeModal()">+ Add Recipe</button>
+      </div>
+      <div id="myrecipes-grid" class="recipe-grid"></div>
+      <div id="no-myrecipes" class="empty-state hidden">
+        <span class="empty-icon">📝</span>
+        <p>No custom recipes yet. Add your own!</p>
+      </div>
+    </section>
+
     <!-- Shopping Tab -->
     <section id="shopping-tab" class="tab-content">
       <div class="shopping-header">
@@ -75,6 +88,89 @@
       <div class="modal-content">
         <button class="modal-close">&times;</button>
         <div id="modal-body"></div>
+      </div>
+    </div>
+
+    <!-- Add Recipe Modal -->
+    <div id="add-recipe-modal" class="modal hidden">
+      <div class="modal-content add-recipe-form">
+        <button class="modal-close" onclick="closeAddRecipeModal()">&times;</button>
+        <div class="modal-header">
+          <h2>Add Recipe</h2>
+        </div>
+        <form id="add-recipe-form" class="modal-body">
+          <div class="form-group">
+            <label for="recipe-name">Name *</label>
+            <input type="text" id="recipe-name" required placeholder="e.g., Spicy Peanut Noodles">
+          </div>
+          
+          <div class="form-group">
+            <label for="recipe-description">Description</label>
+            <input type="text" id="recipe-description" placeholder="A short description">
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="recipe-cuisine">Cuisine *</label>
+              <select id="recipe-cuisine" required>
+                <option value="">Select...</option>
+                <option value="Japanese">Japanese</option>
+                <option value="Chinese">Chinese</option>
+                <option value="Indian">Indian</option>
+                <option value="Thai">Thai</option>
+                <option value="Italian">Italian</option>
+                <option value="Middle Eastern">Middle Eastern</option>
+                <option value="Mexican">Mexican</option>
+                <option value="Korean">Korean</option>
+                <option value="Asian">Asian (other)</option>
+                <option value="Mediterranean">Mediterranean</option>
+                <option value="International">International</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="recipe-duration">Time (min) *</label>
+              <input type="number" id="recipe-duration" required min="1" placeholder="30">
+            </div>
+            
+            <div class="form-group">
+              <label for="recipe-servings">Servings</label>
+              <input type="number" id="recipe-servings" value="2" min="1">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Equipment</label>
+            <div class="checkbox-group">
+              <label class="checkbox-label"><input type="checkbox" name="equipment" value="pot"> Pot</label>
+              <label class="checkbox-label"><input type="checkbox" name="equipment" value="pan"> Pan</label>
+              <label class="checkbox-label"><input type="checkbox" name="equipment" value="wok"> Wok</label>
+              <label class="checkbox-label"><input type="checkbox" name="equipment" value="blender"> Blender</label>
+              <label class="checkbox-label"><input type="checkbox" name="equipment" value="airfryer"> Airfryer</label>
+              <label class="checkbox-label"><input type="checkbox" name="equipment" value="oven"> Oven</label>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="recipe-ingredients">Ingredients * <span class="hint">(one per line)</span></label>
+            <textarea id="recipe-ingredients" required rows="6" placeholder="200g noodles&#10;2 tbsp soy sauce&#10;1 clove garlic, minced"></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="recipe-instructions">Instructions * <span class="hint">(one step per line)</span></label>
+            <textarea id="recipe-instructions" required rows="6" placeholder="Cook noodles according to package&#10;Stir-fry garlic until fragrant&#10;Add sauce and toss"></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="recipe-source">Source URL <span class="hint">(optional)</span></label>
+            <input type="url" id="recipe-source" placeholder="https://...">
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeAddRecipeModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Recipe</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>

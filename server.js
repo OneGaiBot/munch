@@ -21,6 +21,8 @@ db.exec(`
     seasonal TEXT,
     ingredients TEXT NOT NULL,
     instructions TEXT NOT NULL,
+    source_url TEXT,
+    custom INTEGER DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
@@ -40,6 +42,14 @@ db.exec(`
   );
 `);
 
+// Migration: add custom and source_url columns if they don't exist
+try {
+  db.exec(`ALTER TABLE recipes ADD COLUMN custom INTEGER DEFAULT 0`);
+} catch (e) { /* column exists */ }
+try {
+  db.exec(`ALTER TABLE recipes ADD COLUMN source_url TEXT`);
+} catch (e) { /* column exists */ }
+
 // Middleware
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -48,7 +58,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Get all recipes with optional filters
 app.get('/api/recipes', (req, res) => {
-  const { cuisine, maxDuration, equipment, favorites, search } = req.query;
+  const { cuisine, maxDuration, equipment, favorites, search, custom } = req.query;
   
   let query = 'SELECT * FROM recipes WHERE 1=1';
   const params = [];
@@ -73,7 +83,11 @@ app.get('/api/recipes', (req, res) => {
     params.push(`%${search}%`, `%${search}%`, `%${search}%`);
   }
 
-  query += ' ORDER BY name ASC';
+  if (custom === 'true') {
+    query += ' AND custom = 1';
+  }
+
+  query += ' ORDER BY created_at DESC';
 
   let recipes = db.prepare(query).all(...params);
 
@@ -86,7 +100,8 @@ app.get('/api/recipes', (req, res) => {
     instructions: JSON.parse(r.instructions),
     equipment: r.equipment ? JSON.parse(r.equipment) : [],
     seasonal: r.seasonal ? JSON.parse(r.seasonal) : [],
-    isFavorite: favIds.includes(r.id)
+    isFavorite: favIds.includes(r.id),
+    isCustom: r.custom === 1
   }));
 
   if (favorites === 'true') {
@@ -111,8 +126,76 @@ app.get('/api/recipes/:id', (req, res) => {
     instructions: JSON.parse(recipe.instructions),
     equipment: recipe.equipment ? JSON.parse(recipe.equipment) : [],
     seasonal: recipe.seasonal ? JSON.parse(recipe.seasonal) : [],
-    isFavorite: !!isFavorite
+    isFavorite: !!isFavorite,
+    isCustom: recipe.custom === 1
   });
+});
+
+// Create a new recipe
+app.post('/api/recipes', (req, res) => {
+  const { name, description, cuisine, duration, servings, equipment, ingredients, instructions, source_url } = req.body;
+  
+  // Validation
+  if (!name || typeof name !== 'string' || name.trim().length === 0) {
+    return res.status(400).json({ error: 'Name is required' });
+  }
+  if (!cuisine || typeof cuisine !== 'string') {
+    return res.status(400).json({ error: 'Cuisine is required' });
+  }
+  if (!duration || typeof duration !== 'number' || duration < 1) {
+    return res.status(400).json({ error: 'Duration must be a positive number' });
+  }
+  if (!ingredients || !Array.isArray(ingredients) || ingredients.length === 0) {
+    return res.status(400).json({ error: 'At least one ingredient is required' });
+  }
+  if (!instructions || !Array.isArray(instructions) || instructions.length === 0) {
+    return res.status(400).json({ error: 'At least one instruction is required' });
+  }
+
+  const result = db.prepare(`
+    INSERT INTO recipes (name, description, cuisine, duration, servings, equipment, ingredients, instructions, source_url, custom)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+  `).run(
+    name.trim(),
+    description?.trim() || '',
+    cuisine.trim(),
+    duration,
+    servings || 2,
+    JSON.stringify(equipment || []),
+    JSON.stringify(ingredients),
+    JSON.stringify(instructions),
+    source_url?.trim() || null
+  );
+
+  const newRecipe = db.prepare('SELECT * FROM recipes WHERE id = ?').get(result.lastInsertRowid);
+  
+  res.status(201).json({
+    ...newRecipe,
+    ingredients: JSON.parse(newRecipe.ingredients),
+    instructions: JSON.parse(newRecipe.instructions),
+    equipment: newRecipe.equipment ? JSON.parse(newRecipe.equipment) : [],
+    isCustom: true,
+    isFavorite: false
+  });
+});
+
+// Delete a recipe (only custom)
+app.delete('/api/recipes/:id', (req, res) => {
+  const { id } = req.params;
+  const recipe = db.prepare('SELECT custom FROM recipes WHERE id = ?').get(id);
+  
+  if (!recipe) {
+    return res.status(404).json({ error: 'Recipe not found' });
+  }
+  if (recipe.custom !== 1) {
+    return res.status(403).json({ error: 'Can only delete custom recipes' });
+  }
+  
+  db.prepare('DELETE FROM favorites WHERE recipe_id = ?').run(id);
+  db.prepare('DELETE FROM shopping_list WHERE recipe_id = ?').run(id);
+  db.prepare('DELETE FROM recipes WHERE id = ?').run(id);
+  
+  res.status(204).send();
 });
 
 // Get cuisines
