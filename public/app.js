@@ -184,7 +184,7 @@ async function openRecipe(id) {
       </div>
       ${recipe.source_url ? `<p class="source-link">Source: <a href="${recipe.source_url}" target="_blank" rel="noopener">${getDomain(recipe.source_url)}</a></p>` : ''}
     </div>
-    <div class="modal-body">
+    <div class="modal-body-scroll">
       <div class="modal-section">
         <h3>Servings</h3>
         <div class="servings-control">

@@ -335,9 +335,14 @@ select:focus, #search:focus {
 
 .modal-body {
   padding: 1.5rem;
+}
+
+.modal-body-scroll {
+  padding: 1.5rem;
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  max-height: calc(100vh - 200px);
 }
 
 .modal-section {
@@ -1114,8 +1119,12 @@ select:focus, #search:focus {
     flex-shrink: 0;
   }
 
-  .modal-body {
+  .modal-body,
+  .modal-body-scroll {
     padding: 1rem;
+  }
+
+  .modal-body-scroll {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     flex: 1;
