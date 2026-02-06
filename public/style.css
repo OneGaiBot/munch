@@ -340,7 +340,7 @@ select:focus, #search:focus {
 }
 
 .modal-body-scroll {
-  padding: 1.5rem;
+  padding: 1.5rem 1.5rem 5rem 1.5rem;
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
@@ -1124,12 +1124,12 @@ select:focus, #search:focus {
     flex-shrink: 0;
   }
 
-  .modal-body,
-  .modal-body-scroll {
+  .modal-body {
     padding: 1rem;
   }
 
   .modal-body-scroll {
+    padding: 1rem 1rem 5rem 1rem;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     flex: 1;
