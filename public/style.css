@@ -659,14 +659,7 @@ select:focus, #search:focus {
   gap: 1rem;
 }
 
-.add-recipe-form .form-actions {
-  position: sticky;
-  bottom: 0;
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  margin: 0 -1rem -1rem;
-  padding: 1rem;
-}
+/* add-recipe-form actions now use standard modal-actions */
 
 .form-group {
   display: flex;
@@ -746,17 +739,7 @@ select:focus, #search:focus {
   display: none;
 }
 
-.form-actions {
-  display: flex;
-  gap: 0.75rem;
-  padding-top: 0.5rem;
-  border-top: 1px solid var(--border);
-  margin-top: 0.5rem;
-}
-
-.form-actions .btn {
-  flex: 1;
-}
+/* form-actions styles moved to modal-actions */
 
 /* Source badge */
 .source-badge {

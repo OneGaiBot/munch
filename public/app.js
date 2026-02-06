@@ -472,6 +472,17 @@ function openAddRecipeModal() {
   addRecipeForm.reset();
   addRecipeModal.classList.remove('hidden');
   document.body.classList.add('modal-open');
+  
+  // Handle iOS Safari viewport height changes
+  updateModalHeight();
+  
+  // Prevent scrolling background when modal is open
+  const modalBodyScroll = addRecipeModal.querySelector('.modal-body-scroll');
+  if (modalBodyScroll) {
+    modalBodyScroll.addEventListener('touchmove', (e) => {
+      e.stopPropagation();
+    }, { passive: true });
+  }
 }
 
 function closeAddRecipeModal() {
@@ -482,6 +493,14 @@ function closeAddRecipeModal() {
 addRecipeModal.addEventListener('click', (e) => {
   if (e.target === addRecipeModal) closeAddRecipeModal();
 });
+
+// Prevent background scrolling when touching add recipe modal content
+const addRecipeModalContent = addRecipeModal.querySelector('.modal-content');
+if (addRecipeModalContent) {
+  addRecipeModalContent.addEventListener('touchmove', (e) => {
+    e.stopPropagation();
+  }, { passive: false });
+}
 
 // Submit new recipe
 addRecipeForm.addEventListener('submit', async (e) => {

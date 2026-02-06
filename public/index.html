@@ -136,7 +136,8 @@
         <div class="modal-header">
           <h2>Add Recipe</h2>
         </div>
-        <form id="add-recipe-form" class="modal-body">
+        <div class="modal-body-scroll">
+          <form id="add-recipe-form">
           <div class="form-group">
             <label for="recipe-name">Name *</label>
             <input type="text" id="recipe-name" required placeholder="e.g., Spicy Peanut Noodles">
@@ -204,11 +205,12 @@
             <input type="url" id="recipe-source" placeholder="https://...">
           </div>
           
-          <div class="form-actions">
-            <button type="button" class="btn btn-secondary" onclick="closeAddRecipeModal()">Cancel</button>
-            <button type="submit" class="btn btn-primary">Save Recipe</button>
-          </div>
-        </form>
+          </form>
+        </div>
+        <div class="form-actions modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeAddRecipeModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" onclick="document.getElementById('add-recipe-form').requestSubmit()">Save Recipe</button>
+        </div>
       </div>
     </div>
   </div>
