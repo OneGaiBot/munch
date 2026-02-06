@@ -509,15 +509,43 @@ function renderShuffleCard() {
   
   document.getElementById('shuffle-name').textContent = r.name;
   document.getElementById('shuffle-description').textContent = r.description || '';
+  
+  // Meta tags including equipment
+  const equipmentTags = (r.equipment || []).map(e => 
+    `<span class="tag equipment">${equipmentEmoji[e] || '🍳'} ${e}</span>`
+  ).join('');
+  
   document.getElementById('shuffle-meta').innerHTML = `
     <span class="tag cuisine">${r.cuisine}</span>
     <span class="tag">⏱️ ${r.duration} min</span>
+    <span class="tag">👥 ${r.servings} servings</span>
     <span class="tag source-tag ${r.source}">${sourceBadge[r.source] || '🍽️'}</span>
+    ${equipmentTags}
   `;
+  
+  // Ingredients
+  document.getElementById('shuffle-ingredients').innerHTML = 
+    r.ingredients.map(i => `<li>${i}</li>`).join('');
+  
+  // Instructions
+  document.getElementById('shuffle-instructions').innerHTML = 
+    r.instructions.map(s => `<li>${s}</li>`).join('');
+  
+  // Source
+  const sourceEl = document.getElementById('shuffle-source');
+  if (r.source_url) {
+    sourceEl.innerHTML = `Source: <a href="${r.source_url}" target="_blank" rel="noopener">${getDomain(r.source_url)}</a>`;
+    sourceEl.style.display = '';
+  } else {
+    sourceEl.style.display = 'none';
+  }
+  
   document.getElementById('shuffle-counter').textContent = `${shuffleIndex + 1} / ${shuffleRecipes.length}`;
   
-  // Reset card position
+  // Reset card position and scroll to top
   shuffleCard.classList.remove('swipe-left', 'swipe-right');
+  shuffleCard.style.transform = '';
+  document.querySelector('.shuffle-container').scrollTop = 0;
 }
 
 function shuffleNext() {

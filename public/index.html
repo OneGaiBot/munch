@@ -89,6 +89,10 @@
     <!-- Shuffle Overlay -->
     <div id="shuffle-overlay" class="shuffle-overlay hidden">
       <button class="shuffle-close" onclick="closeShuffle()">✕</button>
+      <div class="shuffle-progress-top">
+        <span id="shuffle-counter">1 / 10</span>
+        <span class="shuffle-hint">← Skip | Pick →</span>
+      </div>
       <div class="shuffle-container">
         <div class="shuffle-card" id="shuffle-card">
           <div class="shuffle-image" id="shuffle-image"></div>
@@ -96,24 +100,28 @@
             <h2 id="shuffle-name"></h2>
             <p id="shuffle-description"></p>
             <div class="shuffle-meta" id="shuffle-meta"></div>
+            
+            <div class="shuffle-section">
+              <h3>Ingredients</h3>
+              <ul id="shuffle-ingredients" class="shuffle-ingredients"></ul>
+            </div>
+            
+            <div class="shuffle-section">
+              <h3>Instructions</h3>
+              <ol id="shuffle-instructions" class="shuffle-instructions"></ol>
+            </div>
+            
+            <div class="shuffle-source" id="shuffle-source"></div>
           </div>
-        </div>
-        <div class="shuffle-hint">
-          <span>👈 Swipe or press arrow keys</span>
         </div>
       </div>
       <div class="shuffle-actions">
         <button class="shuffle-btn skip" onclick="shuffleNext()">
-          <span>Skip</span>
-          <small>→</small>
+          <span>👎 Skip</span>
         </button>
         <button class="shuffle-btn pick" onclick="shufflePick()">
-          <span>Cook this!</span>
-          <small>🍳</small>
+          <span>🍳 Cook this!</span>
         </button>
-      </div>
-      <div class="shuffle-progress">
-        <span id="shuffle-counter">1 / 10</span>
       </div>
     </div>
 
