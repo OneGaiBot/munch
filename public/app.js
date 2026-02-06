@@ -226,6 +226,7 @@ async function openRecipe(id) {
   window.currentRecipe = recipe;
   
   modal.classList.remove('hidden');
+  document.body.classList.add('modal-open');
 }
 
 // Adjust servings
@@ -360,10 +361,30 @@ document.getElementById('clear-all').addEventListener('click', async () => {
 // Close modal
 document.querySelector('.modal-close').addEventListener('click', () => {
   modal.classList.add('hidden');
+  document.body.classList.remove('modal-open');
 });
 
 modal.addEventListener('click', (e) => {
-  if (e.target === modal) modal.classList.add('hidden');
+  if (e.target === modal) {
+    modal.classList.add('hidden');
+    document.body.classList.remove('modal-open');
+  }
+});
+
+// ESC key to close modals
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (!modal.classList.contains('hidden')) {
+      modal.classList.add('hidden');
+      document.body.classList.remove('modal-open');
+    }
+    if (!addRecipeModal.classList.contains('hidden')) {
+      closeAddRecipeModal();
+    }
+    if (!shuffleOverlay.classList.contains('hidden')) {
+      closeShuffle();
+    }
+  }
 });
 
 // Filters
@@ -386,6 +407,7 @@ async function deleteRecipe(id) {
     const res = await fetch(`/api/recipes/${id}`, { method: 'DELETE' });
     if (res.ok) {
       modal.classList.add('hidden');
+      document.body.classList.remove('modal-open');
       fetchRecipes();
     } else {
       const err = await res.json();
@@ -400,10 +422,12 @@ async function deleteRecipe(id) {
 function openAddRecipeModal() {
   addRecipeForm.reset();
   addRecipeModal.classList.remove('hidden');
+  document.body.classList.add('modal-open');
 }
 
 function closeAddRecipeModal() {
   addRecipeModal.classList.add('hidden');
+  document.body.classList.remove('modal-open');
 }
 
 addRecipeModal.addEventListener('click', (e) => {
@@ -482,12 +506,12 @@ function startShuffle() {
   shuffleIndex = 0;
   renderShuffleCard();
   shuffleOverlay.classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
+  document.body.classList.add('modal-open');
 }
 
 function closeShuffle() {
   shuffleOverlay.classList.add('hidden');
-  document.body.style.overflow = '';
+  document.body.classList.remove('modal-open');
 }
 
 function renderShuffleCard() {
