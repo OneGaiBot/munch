@@ -89,6 +89,8 @@ async function fetchRecipes() {
 
   const res = await fetch(`/api/recipes?${params}`);
   recipes = await res.json();
+  // Shuffle recipes for variety
+  recipes.sort(() => Math.random() - 0.5);
   renderRecipes();
 }
 

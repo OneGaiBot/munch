@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="bowl" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d9488"/>
+      <stop offset="100%" style="stop-color:#2dd4bf"/>
+    </linearGradient>
+  </defs>
+  <!-- Bowl -->
+  <ellipse cx="50" cy="70" rx="40" ry="20" fill="url(#bowl)"/>
+  <path d="M10 55 Q10 85 50 85 Q90 85 90 55 L90 60 Q90 90 50 90 Q10 90 10 60 Z" fill="url(#bowl)"/>
+  <!-- Noodles -->
+  <path d="M25 50 Q30 35 35 50 Q40 65 45 50" stroke="#fbbf24" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M40 48 Q45 33 50 48 Q55 63 60 48" stroke="#fbbf24" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M55 50 Q60 35 65 50 Q70 65 75 50" stroke="#fbbf24" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- Steam -->
+  <path d="M30 30 Q25 20 30 10" stroke="#e8eaed" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.6"/>
+  <path d="M50 25 Q45 15 50 5" stroke="#e8eaed" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.6"/>
+  <path d="M70 30 Q65 20 70 10" stroke="#e8eaed" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.6"/>
+</svg>
