@@ -85,6 +85,8 @@ app.get('/api/recipes', (req, res) => {
 
   if (custom === 'true') {
     query += ' AND custom = 1';
+  } else if (custom === 'false') {
+    query += ' AND custom = 0';
   }
 
   query += ' ORDER BY created_at DESC';

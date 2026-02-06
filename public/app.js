@@ -14,13 +14,12 @@ const modalBody = document.getElementById('modal-body');
 const cuisineFilter = document.getElementById('cuisine-filter');
 const timeFilter = document.getElementById('time-filter');
 const equipmentFilter = document.getElementById('equipment-filter');
+const sourceFilter = document.getElementById('source-filter');
 const searchInput = document.getElementById('search');
 
 const shoppingList = document.getElementById('shopping-list');
 const noShopping = document.getElementById('no-shopping');
 const noFavorites = document.getElementById('no-favorites');
-const myRecipesGrid = document.getElementById('myrecipes-grid');
-const noMyRecipes = document.getElementById('no-myrecipes');
 const addRecipeModal = document.getElementById('add-recipe-modal');
 const addRecipeForm = document.getElementById('add-recipe-form');
 
@@ -59,7 +58,6 @@ tabs.forEach(tab => {
     document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
     
     if (tab.dataset.tab === 'favorites') loadFavorites();
-    if (tab.dataset.tab === 'myrecipes') loadMyRecipes();
     if (tab.dataset.tab === 'shopping') loadShoppingList();
   });
 });
@@ -71,6 +69,8 @@ async function fetchRecipes() {
   if (timeFilter.value) params.set('maxDuration', timeFilter.value);
   if (equipmentFilter.value) params.set('equipment', equipmentFilter.value);
   if (searchInput.value) params.set('search', searchInput.value);
+  if (sourceFilter.value === 'custom') params.set('custom', 'true');
+  if (sourceFilter.value === 'onegai') params.set('custom', 'false');
 
   const res = await fetch(`/api/recipes?${params}`);
   recipes = await res.json();
@@ -105,7 +105,7 @@ function renderRecipes(container = recipeGrid, data = recipes) {
     <div class="recipe-card" data-id="${r.id}">
       <div class="card-image">
         ${cuisineEmoji[r.cuisine] || '🍽️'}
-        ${r.isCustom ? '<span class="custom-badge">MY RECIPE</span>' : ''}
+        <span class="source-badge ${r.isCustom ? 'custom' : 'onegai'}">${r.isCustom ? '📝 Mine' : '🤖 OneGai'}</span>
         <button class="card-favorite ${r.isFavorite ? 'active' : ''}" onclick="toggleFavorite(event, ${r.id})">
           ${r.isFavorite ? '❤️' : '🤍'}
         </button>
@@ -201,6 +201,7 @@ async function openRecipe(id) {
       <button class="btn btn-primary" onclick="addToShoppingList(${recipe.id})">
         🛒 Add to List
       </button>
+      ${recipe.isCustom ? `<button class="btn btn-danger" onclick="deleteRecipe(${recipe.id})">🗑️ Delete</button>` : ''}
     </div>
   `;
 
@@ -352,6 +353,7 @@ modal.addEventListener('click', (e) => {
 cuisineFilter.addEventListener('change', fetchRecipes);
 timeFilter.addEventListener('change', fetchRecipes);
 equipmentFilter.addEventListener('change', fetchRecipes);
+sourceFilter.addEventListener('change', fetchRecipes);
 
 let searchTimeout;
 searchInput.addEventListener('input', () => {
@@ -359,17 +361,21 @@ searchInput.addEventListener('input', () => {
   searchTimeout = setTimeout(fetchRecipes, 300);
 });
 
-// Load my recipes
-async function loadMyRecipes() {
-  const res = await fetch('/api/recipes?custom=true');
-  const myRecipes = await res.json();
+// Delete recipe
+async function deleteRecipe(id) {
+  if (!confirm('Delete this recipe?')) return;
   
-  if (myRecipes.length === 0) {
-    myRecipesGrid.innerHTML = '';
-    noMyRecipes.classList.remove('hidden');
-  } else {
-    noMyRecipes.classList.add('hidden');
-    renderRecipes(myRecipesGrid, myRecipes);
+  try {
+    const res = await fetch(`/api/recipes/${id}`, { method: 'DELETE' });
+    if (res.ok) {
+      modal.classList.add('hidden');
+      fetchRecipes();
+    } else {
+      const err = await res.json();
+      alert(err.error || 'Failed to delete recipe');
+    }
+  } catch (err) {
+    alert('Failed to delete recipe');
   }
 }
 

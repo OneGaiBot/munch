@@ -698,16 +698,41 @@ select:focus, #search:focus {
   flex: 1;
 }
 
-/* Custom recipe badge */
-.custom-badge {
+/* Source badge */
+.source-badge {
   position: absolute;
   top: 0.75rem;
   left: 0.75rem;
-  background: rgba(0,0,0,0.5);
-  padding: 0.25rem 0.5rem;
+  background: rgba(0,0,0,0.6);
+  padding: 0.3rem 0.6rem;
   border-radius: 4px;
   font-size: 0.7rem;
   font-weight: 500;
+}
+
+.source-badge.custom {
+  background: rgba(244, 114, 182, 0.8);
+}
+
+.source-badge.onegai {
+  background: rgba(45, 212, 191, 0.8);
+  color: #0c1015;
+}
+
+/* Add button in filters */
+.btn-add {
+  padding: 0.75rem 1.25rem;
+  white-space: nowrap;
+}
+
+/* Danger button */
+.btn-danger {
+  background: #dc2626;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #b91c1c;
 }
 
 /* Responsive */

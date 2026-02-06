@@ -14,9 +14,8 @@
     </header>
 
     <nav class="tabs">
-      <button class="tab active" data-tab="recipes">Recipes</button>
+      <button class="tab active" data-tab="recipes">All Recipes</button>
       <button class="tab" data-tab="favorites">Favorites</button>
-      <button class="tab" data-tab="myrecipes">My Recipes</button>
       <button class="tab" data-tab="shopping">Shopping List</button>
     </nav>
 
@@ -40,6 +39,12 @@
             <option value="wok">Wok</option>
             <option value="blender">Blender</option>
           </select>
+          <select id="source-filter">
+            <option value="">All Sources</option>
+            <option value="onegai">🤖 OneGai's Recipes</option>
+            <option value="custom">📝 My Recipes</option>
+          </select>
+          <button class="btn btn-primary btn-add" onclick="openAddRecipeModal()">+ Add</button>
         </div>
         <div class="search-row">
           <input type="text" id="search" placeholder="Search recipes...">
@@ -55,18 +60,6 @@
       <div id="no-favorites" class="empty-state hidden">
         <span class="empty-icon">❤️</span>
         <p>No favorites yet. Tap the heart on recipes you love!</p>
-      </div>
-    </section>
-
-    <!-- My Recipes Tab -->
-    <section id="myrecipes-tab" class="tab-content">
-      <div class="myrecipes-header">
-        <button class="btn btn-primary" onclick="openAddRecipeModal()">+ Add Recipe</button>
-      </div>
-      <div id="myrecipes-grid" class="recipe-grid"></div>
-      <div id="no-myrecipes" class="empty-state hidden">
-        <span class="empty-icon">📝</span>
-        <p>No custom recipes yet. Add your own!</p>
       </div>
     </section>
 
