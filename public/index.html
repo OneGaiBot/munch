@@ -46,6 +46,7 @@
             <option value="themealdb">🌐 TheMealDB</option>
           </select>
           <button class="btn btn-primary btn-add" onclick="openAddRecipeModal()">+ Add</button>
+          <button class="btn btn-shuffle" onclick="startShuffle()">🎲 Shuffle</button>
         </div>
         <div class="search-row">
           <input type="text" id="search" placeholder="Search recipes...">
@@ -82,6 +83,37 @@
       <div class="modal-content">
         <button class="modal-close">&times;</button>
         <div id="modal-body"></div>
+      </div>
+    </div>
+
+    <!-- Shuffle Overlay -->
+    <div id="shuffle-overlay" class="shuffle-overlay hidden">
+      <button class="shuffle-close" onclick="closeShuffle()">✕</button>
+      <div class="shuffle-container">
+        <div class="shuffle-card" id="shuffle-card">
+          <div class="shuffle-image" id="shuffle-image"></div>
+          <div class="shuffle-body">
+            <h2 id="shuffle-name"></h2>
+            <p id="shuffle-description"></p>
+            <div class="shuffle-meta" id="shuffle-meta"></div>
+          </div>
+        </div>
+        <div class="shuffle-hint">
+          <span>👈 Swipe or press arrow keys</span>
+        </div>
+      </div>
+      <div class="shuffle-actions">
+        <button class="shuffle-btn skip" onclick="shuffleNext()">
+          <span>Skip</span>
+          <small>→</small>
+        </button>
+        <button class="shuffle-btn pick" onclick="shufflePick()">
+          <span>Cook this!</span>
+          <small>🍳</small>
+        </button>
+      </div>
+      <div class="shuffle-progress">
+        <span id="shuffle-counter">1 / 10</span>
       </div>
     </div>
 

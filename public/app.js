@@ -463,6 +463,164 @@ addRecipeForm.addEventListener('submit', async (e) => {
   }
 });
 
+// Shuffle mode
+let shuffleRecipes = [];
+let shuffleIndex = 0;
+const shuffleOverlay = document.getElementById('shuffle-overlay');
+const shuffleCard = document.getElementById('shuffle-card');
+
+function startShuffle() {
+  // Use current filtered recipes, shuffle them
+  if (recipes.length === 0) {
+    alert('No recipes to shuffle!');
+    return;
+  }
+  
+  shuffleRecipes = [...recipes].sort(() => Math.random() - 0.5);
+  shuffleIndex = 0;
+  renderShuffleCard();
+  shuffleOverlay.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeShuffle() {
+  shuffleOverlay.classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+function renderShuffleCard() {
+  if (shuffleIndex >= shuffleRecipes.length) {
+    // No more recipes
+    closeShuffle();
+    alert('No more recipes! Try adjusting your filters.');
+    return;
+  }
+  
+  const r = shuffleRecipes[shuffleIndex];
+  
+  const imageEl = document.getElementById('shuffle-image');
+  if (r.image) {
+    imageEl.style.backgroundImage = `url('${r.image}')`;
+    imageEl.textContent = '';
+  } else {
+    imageEl.style.backgroundImage = '';
+    imageEl.textContent = cuisineEmoji[r.cuisine] || '🍽️';
+  }
+  
+  document.getElementById('shuffle-name').textContent = r.name;
+  document.getElementById('shuffle-description').textContent = r.description || '';
+  document.getElementById('shuffle-meta').innerHTML = `
+    <span class="tag cuisine">${r.cuisine}</span>
+    <span class="tag">⏱️ ${r.duration} min</span>
+    <span class="tag source-tag ${r.source}">${sourceBadge[r.source] || '🍽️'}</span>
+  `;
+  document.getElementById('shuffle-counter').textContent = `${shuffleIndex + 1} / ${shuffleRecipes.length}`;
+  
+  // Reset card position
+  shuffleCard.classList.remove('swipe-left', 'swipe-right');
+}
+
+function shuffleNext() {
+  shuffleCard.classList.add('swipe-left');
+  setTimeout(() => {
+    shuffleIndex++;
+    renderShuffleCard();
+  }, 300);
+}
+
+function shufflePick() {
+  const r = shuffleRecipes[shuffleIndex];
+  closeShuffle();
+  openRecipe(r.id);
+}
+
+// Swipe handling
+let touchStartX = 0;
+let touchCurrentX = 0;
+let isDragging = false;
+
+shuffleCard.addEventListener('touchstart', (e) => {
+  touchStartX = e.touches[0].clientX;
+  isDragging = true;
+  shuffleCard.classList.add('swiping');
+});
+
+shuffleCard.addEventListener('touchmove', (e) => {
+  if (!isDragging) return;
+  touchCurrentX = e.touches[0].clientX;
+  const diff = touchCurrentX - touchStartX;
+  shuffleCard.style.transform = `translateX(${diff}px) rotate(${diff * 0.05}deg)`;
+});
+
+shuffleCard.addEventListener('touchend', () => {
+  if (!isDragging) return;
+  isDragging = false;
+  shuffleCard.classList.remove('swiping');
+  
+  const diff = touchCurrentX - touchStartX;
+  
+  if (diff < -100) {
+    // Swiped left - skip
+    shuffleNext();
+  } else if (diff > 100) {
+    // Swiped right - pick
+    shuffleCard.classList.add('swipe-right');
+    setTimeout(() => shufflePick(), 300);
+  } else {
+    // Return to center
+    shuffleCard.style.transform = '';
+  }
+  
+  touchStartX = 0;
+  touchCurrentX = 0;
+});
+
+// Mouse drag support
+shuffleCard.addEventListener('mousedown', (e) => {
+  touchStartX = e.clientX;
+  isDragging = true;
+  shuffleCard.classList.add('swiping');
+  e.preventDefault();
+});
+
+document.addEventListener('mousemove', (e) => {
+  if (!isDragging) return;
+  touchCurrentX = e.clientX;
+  const diff = touchCurrentX - touchStartX;
+  shuffleCard.style.transform = `translateX(${diff}px) rotate(${diff * 0.05}deg)`;
+});
+
+document.addEventListener('mouseup', () => {
+  if (!isDragging) return;
+  isDragging = false;
+  shuffleCard.classList.remove('swiping');
+  
+  const diff = touchCurrentX - touchStartX;
+  
+  if (diff < -100) {
+    shuffleNext();
+  } else if (diff > 100) {
+    shuffleCard.classList.add('swipe-right');
+    setTimeout(() => shufflePick(), 300);
+  } else {
+    shuffleCard.style.transform = '';
+  }
+  
+  touchStartX = 0;
+  touchCurrentX = 0;
+});
+
+// Keyboard support
+document.addEventListener('keydown', (e) => {
+  if (shuffleOverlay.classList.contains('hidden')) return;
+  
+  if (e.key === 'ArrowLeft' || e.key === 'Escape') {
+    shuffleNext();
+  } else if (e.key === 'ArrowRight' || e.key === 'Enter') {
+    shufflePick();
+  }
+});
+
 // Init
 loadCuisines();
 fetchRecipes();

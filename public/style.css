@@ -757,6 +757,190 @@ select:focus, #search:focus {
   background: #b91c1c;
 }
 
+/* Shuffle button */
+.btn-shuffle {
+  background: linear-gradient(135deg, #8b5cf6, #a855f7);
+  color: white;
+  padding: 0.75rem 1.25rem;
+  white-space: nowrap;
+}
+
+.btn-shuffle:hover {
+  background: linear-gradient(135deg, #7c3aed, #9333ea);
+}
+
+/* Shuffle Overlay */
+.shuffle-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.shuffle-overlay.hidden {
+  display: none;
+}
+
+.shuffle-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 44px;
+  height: 44px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  font-size: 1.25rem;
+  color: var(--text);
+  cursor: pointer;
+  z-index: 10;
+}
+
+.shuffle-close:hover {
+  background: var(--surface-hover);
+}
+
+.shuffle-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+}
+
+.shuffle-card {
+  background: var(--surface);
+  border-radius: 16px;
+  overflow: hidden;
+  width: 100%;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  border: 1px solid var(--border);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  cursor: grab;
+  user-select: none;
+}
+
+.shuffle-card.swiping {
+  transition: none;
+}
+
+.shuffle-card.swipe-left {
+  transform: translateX(-150%) rotate(-20deg);
+  opacity: 0;
+}
+
+.shuffle-card.swipe-right {
+  transform: translateX(150%) rotate(20deg);
+  opacity: 0;
+}
+
+.shuffle-image {
+  height: 250px;
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 5rem;
+  background-size: cover;
+  background-position: center;
+}
+
+.shuffle-body {
+  padding: 1.25rem;
+}
+
+.shuffle-body h2 {
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.shuffle-body p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+
+.shuffle-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.shuffle-hint {
+  margin-top: 1.5rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+.shuffle-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.shuffle-btn {
+  flex: 1;
+  padding: 1rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.shuffle-btn:hover {
+  transform: scale(1.02);
+}
+
+.shuffle-btn:active {
+  transform: scale(0.98);
+}
+
+.shuffle-btn span {
+  font-weight: 600;
+}
+
+.shuffle-btn small {
+  opacity: 0.7;
+  font-size: 0.85rem;
+}
+
+.shuffle-btn.skip {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.shuffle-btn.skip:hover {
+  background: var(--surface-hover);
+}
+
+.shuffle-btn.pick {
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+  color: #0c1015;
+}
+
+.shuffle-progress {
+  margin-top: 1rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   header h1 {
