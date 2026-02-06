@@ -1,0 +1,16 @@
+{
+  "name": "munch",
+  "version": "1.0.0",
+  "description": "What's for dinner? Recipe inspiration for vegetarians in Antwerp",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "seed": "node seed.js"
+  },
+  "author": "OneGaiBot",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^11.8.1",
+    "express": "^4.21.2"
+  }
+}

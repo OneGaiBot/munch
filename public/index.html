@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Munch — What's for dinner?</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>🍜 Munch</h1>
+      <p class="tagline">What's for dinner?</p>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="recipes">Recipes</button>
+      <button class="tab" data-tab="favorites">Favorites</button>
+      <button class="tab" data-tab="shopping">Shopping List</button>
+    </nav>
+
+    <!-- Recipes Tab -->
+    <section id="recipes-tab" class="tab-content active">
+      <div class="filters">
+        <div class="filter-row">
+          <select id="cuisine-filter">
+            <option value="all">All Cuisines</option>
+          </select>
+          <select id="time-filter">
+            <option value="">Any Time</option>
+            <option value="15">Under 15 min</option>
+            <option value="20">Under 20 min</option>
+            <option value="30">Under 30 min</option>
+            <option value="45">Under 45 min</option>
+          </select>
+          <select id="equipment-filter">
+            <option value="">Any Equipment</option>
+            <option value="airfryer">Airfryer</option>
+            <option value="wok">Wok</option>
+            <option value="blender">Blender</option>
+          </select>
+        </div>
+        <div class="search-row">
+          <input type="text" id="search" placeholder="Search recipes...">
+        </div>
+      </div>
+
+      <div id="recipe-grid" class="recipe-grid"></div>
+    </section>
+
+    <!-- Favorites Tab -->
+    <section id="favorites-tab" class="tab-content">
+      <div id="favorites-grid" class="recipe-grid"></div>
+      <div id="no-favorites" class="empty-state hidden">
+        <span class="empty-icon">❤️</span>
+        <p>No favorites yet. Tap the heart on recipes you love!</p>
+      </div>
+    </section>
+
+    <!-- Shopping Tab -->
+    <section id="shopping-tab" class="tab-content">
+      <div class="shopping-header">
+        <button id="clear-checked" class="btn-secondary">Clear Checked</button>
+        <button id="clear-all" class="btn-secondary">Clear All</button>
+      </div>
+      <ul id="shopping-list"></ul>
+      <div id="no-shopping" class="empty-state">
+        <span class="empty-icon">🛒</span>
+        <p>Your shopping list is empty. Add ingredients from recipes!</p>
+      </div>
+    </section>
+
+    <!-- Recipe Modal -->
+    <div id="recipe-modal" class="modal hidden">
+      <div class="modal-content">
+        <button class="modal-close">&times;</button>
+        <div id="modal-body"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
