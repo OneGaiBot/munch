@@ -258,6 +258,26 @@ select:focus, #search:focus {
   justify-content: center;
   font-size: 4rem;
   position: relative;
+  transition: opacity 0.3s ease;
+}
+
+.card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card-image img.loaded {
+  opacity: 1;
+}
+
+.card-image.has-image {
+  font-size: 0;
 }
 
 .card-favorite {

@@ -119,15 +119,14 @@ function renderRecipes(container = recipeGrid, data = recipes) {
   }
 
   container.innerHTML = data.map(r => {
-    // Use highlight_image, or first image, or fallback to old image field, or show emoji
-    const displayImage = r.highlight_image || 
-                         (r.images && r.images.length > 0 ? r.images[0] : null) || 
-                         r.image;
+    // Use highlight_image or fallback to old image field
+    const displayImage = r.highlight_image || r.image;
     
     return `
     <div class="recipe-card" data-id="${r.id}">
-      <div class="card-image" ${displayImage ? `style="background-image: url('${displayImage}'); background-size: cover; background-position: center;"` : ''}>
-        ${displayImage ? '' : cuisineEmoji[r.cuisine] || '🍽️'}
+      <div class="card-image ${displayImage ? 'has-image' : ''}" data-image="${displayImage || ''}" data-cuisine="${r.cuisine}">
+        ${!displayImage ? cuisineEmoji[r.cuisine] || '🍽️' : ''}
+        ${displayImage ? `<img data-src="${displayImage}" alt="${r.name}" loading="lazy">` : ''}
         <span class="source-badge ${r.source}">${sourceBadge[r.source] || '🍽️'}</span>
         <button class="card-favorite ${r.isFavorite ? 'active' : ''}" onclick="toggleFavorite(event, ${r.id})">
           ${r.isFavorite ? '❤️' : '🤍'}
@@ -157,7 +156,7 @@ function renderRecipes(container = recipeGrid, data = recipes) {
     </div>
   `).join('');
 
-  // Add click handlers
+  // Add click handlers and lazy loading
   container.querySelectorAll('.recipe-card').forEach(card => {
     card.addEventListener('click', (e) => {
       if (!e.target.closest('.card-favorite')) {
@@ -165,6 +164,9 @@ function renderRecipes(container = recipeGrid, data = recipes) {
       }
     });
   });
+
+  // Setup lazy loading for images
+  setupLazyLoading(container);
 }
 
 // Toggle favorite
@@ -184,13 +186,30 @@ async function toggleFavorite(e, id) {
 
 // Open recipe modal
 async function openRecipe(id) {
-  const res = await fetch(`/api/recipes/${id}`);
-  const recipe = await res.json();
-  
-  currentServings = recipe.servings;
-  baseServings = recipe.servings;
-
+  // Show loading state
+  const modalBody = document.getElementById('modal-body');
   modalBody.innerHTML = `
+    <div style="display: flex; align-items: center; justify-content: center; height: 200px; color: var(--text-muted);">
+      <div style="text-align: center;">
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🍳</div>
+        <div>Loading recipe...</div>
+      </div>
+    </div>
+  `;
+  
+  modal.classList.remove('hidden');
+  document.body.classList.add('modal-open');
+
+  try {
+    const res = await fetch(`/api/recipes/${id}`);
+    if (!res.ok) throw new Error('Failed to load recipe');
+    
+    const recipe = await res.json();
+    
+    currentServings = recipe.servings;
+    baseServings = recipe.servings;
+
+    modalBody.innerHTML = `
     <div class="recipe-header">
       <h2>${recipe.name}</h2>
       <p>${recipe.description}</p>
@@ -259,11 +278,26 @@ async function openRecipe(id) {
     </div>
   `;
 
-  // Store base ingredients for scaling
-  window.currentRecipe = recipe;
-  
-  modal.classList.remove('hidden');
-  document.body.classList.add('modal-open');
+    // Store base ingredients for scaling
+    window.currentRecipe = recipe;
+    
+  } catch (error) {
+    console.error('Error loading recipe:', error);
+    modalBody.innerHTML = `
+      <div style="display: flex; align-items: center; justify-content: center; height: 200px; color: var(--heart); text-align: center;">
+        <div>
+          <div style="font-size: 2rem; margin-bottom: 0.5rem;">❌</div>
+          <div>Failed to load recipe</div>
+          <button class="btn btn-secondary" onclick="closeRecipe()" style="margin-top: 1rem;">Close</button>
+        </div>
+      </div>
+    `;
+  }
+}
+
+function closeRecipe() {
+  modal.classList.add('hidden');
+  document.body.classList.remove('modal-open');
 }
 
 // Adjust servings
@@ -693,7 +727,7 @@ let shuffleIndex = 0;
 const shuffleOverlay = document.getElementById('shuffle-overlay');
 const shuffleCard = document.getElementById('shuffle-card');
 
-function startShuffle() {
+async function startShuffle() {
   // Use current filtered recipes, shuffle them
   if (recipes.length === 0) {
     alert('No recipes to shuffle!');
@@ -702,9 +736,9 @@ function startShuffle() {
   
   shuffleRecipes = [...recipes].sort(() => Math.random() - 0.5);
   shuffleIndex = 0;
-  renderShuffleCard();
   shuffleOverlay.classList.remove('hidden');
   document.body.classList.add('modal-open');
+  await renderShuffleCard();
 }
 
 function closeShuffle() {
@@ -712,7 +746,7 @@ function closeShuffle() {
   document.body.classList.remove('modal-open');
 }
 
-function renderShuffleCard() {
+async function renderShuffleCard() {
   if (shuffleIndex >= shuffleRecipes.length) {
     // No more recipes
     closeShuffle();
@@ -722,61 +756,74 @@ function renderShuffleCard() {
   
   const r = shuffleRecipes[shuffleIndex];
   
-  const imageEl = document.getElementById('shuffle-image');
-  if (r.image) {
-    imageEl.style.backgroundImage = `url('${r.image}')`;
-    imageEl.textContent = '';
-  } else {
-    imageEl.style.backgroundImage = '';
-    imageEl.textContent = cuisineEmoji[r.cuisine] || '🍽️';
+  // Load full recipe details for shuffle
+  try {
+    const res = await fetch(`/api/recipes/${r.id}`);
+    const fullRecipe = await res.json();
+    
+    const imageEl = document.getElementById('shuffle-image');
+    const displayImage = fullRecipe.highlight_image || fullRecipe.image;
+    if (displayImage) {
+      imageEl.style.backgroundImage = `url('${displayImage}')`;
+      imageEl.textContent = '';
+    } else {
+      imageEl.style.backgroundImage = '';
+      imageEl.textContent = cuisineEmoji[fullRecipe.cuisine] || '🍽️';
+    }
+    
+    document.getElementById('shuffle-name').textContent = fullRecipe.name;
+    document.getElementById('shuffle-description').textContent = fullRecipe.description || '';
+    
+    // Meta tags including equipment
+    const equipmentTags = (fullRecipe.equipment || []).map(e => 
+      `<span class="tag equipment">${equipmentEmoji[e] || '🍳'} ${e}</span>`
+    ).join('');
+    
+    document.getElementById('shuffle-meta').innerHTML = `
+      <span class="tag cuisine">${fullRecipe.cuisine}</span>
+      <span class="tag">⏱️ ${fullRecipe.duration} min</span>
+      <span class="tag">👥 ${fullRecipe.servings} servings</span>
+      <span class="tag source-tag ${fullRecipe.source}">${sourceBadge[fullRecipe.source] || '🍽️'}</span>
+      ${equipmentTags}
+    `;
+    
+    // Ingredients
+    document.getElementById('shuffle-ingredients').innerHTML = 
+      fullRecipe.ingredients.map(i => `<li>${i}</li>`).join('');
+    
+    // Instructions
+    document.getElementById('shuffle-instructions').innerHTML = 
+      fullRecipe.instructions.map(s => `<li>${s}</li>`).join('');
+    
+    // Source
+    const sourceEl = document.getElementById('shuffle-source');
+    if (fullRecipe.source_url) {
+      sourceEl.innerHTML = `Source: <a href="${fullRecipe.source_url}" target="_blank" rel="noopener">${getDomain(fullRecipe.source_url)}</a>`;
+      sourceEl.style.display = '';
+    } else {
+      sourceEl.style.display = 'none';
+    }
+    
+    document.getElementById('shuffle-counter').textContent = `${shuffleIndex + 1} / ${shuffleRecipes.length}`;
+    
+    // Reset card position and scroll to top
+    shuffleCard.classList.remove('swipe-left', 'swipe-right');
+    shuffleCard.style.transform = '';
+    document.querySelector('.shuffle-container').scrollTop = 0;
+    
+  } catch (error) {
+    console.error('Error loading shuffle recipe:', error);
+    // Skip to next recipe if loading fails
+    shuffleIndex++;
+    renderShuffleCard();
   }
-  
-  document.getElementById('shuffle-name').textContent = r.name;
-  document.getElementById('shuffle-description').textContent = r.description || '';
-  
-  // Meta tags including equipment
-  const equipmentTags = (r.equipment || []).map(e => 
-    `<span class="tag equipment">${equipmentEmoji[e] || '🍳'} ${e}</span>`
-  ).join('');
-  
-  document.getElementById('shuffle-meta').innerHTML = `
-    <span class="tag cuisine">${r.cuisine}</span>
-    <span class="tag">⏱️ ${r.duration} min</span>
-    <span class="tag">👥 ${r.servings} servings</span>
-    <span class="tag source-tag ${r.source}">${sourceBadge[r.source] || '🍽️'}</span>
-    ${equipmentTags}
-  `;
-  
-  // Ingredients
-  document.getElementById('shuffle-ingredients').innerHTML = 
-    r.ingredients.map(i => `<li>${i}</li>`).join('');
-  
-  // Instructions
-  document.getElementById('shuffle-instructions').innerHTML = 
-    r.instructions.map(s => `<li>${s}</li>`).join('');
-  
-  // Source
-  const sourceEl = document.getElementById('shuffle-source');
-  if (r.source_url) {
-    sourceEl.innerHTML = `Source: <a href="${r.source_url}" target="_blank" rel="noopener">${getDomain(r.source_url)}</a>`;
-    sourceEl.style.display = '';
-  } else {
-    sourceEl.style.display = 'none';
-  }
-  
-  document.getElementById('shuffle-counter').textContent = `${shuffleIndex + 1} / ${shuffleRecipes.length}`;
-  
-  // Reset card position and scroll to top
-  shuffleCard.classList.remove('swipe-left', 'swipe-right');
-  shuffleCard.style.transform = '';
-  document.querySelector('.shuffle-container').scrollTop = 0;
 }
 
 function shuffleNext() {
   shuffleCard.classList.add('swipe-left');
-  setTimeout(() => {
+  setTimeout(async () => {
     shuffleIndex++;
-    renderShuffleCard();
+    await renderShuffleCard();
   }, 300);
 }
 
@@ -923,6 +970,44 @@ function refreshApp() {
     setTimeout(() => {
       btn.classList.remove('spinning');
     }, 800);
+  });
+}
+
+// Lazy loading for images
+let imageObserver;
+
+function setupLazyLoading(container) {
+  if (!imageObserver) {
+    imageObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          const src = img.getAttribute('data-src');
+          if (src) {
+            img.src = src;
+            img.onload = () => {
+              img.classList.add('loaded');
+            };
+            img.onerror = () => {
+              // Fallback to emoji if image fails to load
+              const cardImage = img.closest('.card-image');
+              const cuisine = cardImage.getAttribute('data-cuisine');
+              cardImage.innerHTML = `
+                ${cardImage.innerHTML}
+                <span style="position: absolute; font-size: 4rem;">${cuisineEmoji[cuisine] || '🍽️'}</span>
+              `;
+            };
+            imageObserver.unobserve(img);
+          }
+        }
+      });
+    }, {
+      rootMargin: '50px'
+    });
+  }
+
+  container.querySelectorAll('img[data-src]').forEach(img => {
+    imageObserver.observe(img);
   });
 }
 

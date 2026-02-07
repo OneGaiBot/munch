@@ -126,11 +126,11 @@ app.patch('/api/recipes/:id/images', (req, res) => {
   res.json({ ok: true });
 });
 
-// Get all recipes with optional filters
+// Get recipes list (minimal data for performance)
 app.get('/api/recipes', (req, res) => {
   const { cuisine, maxDuration, equipment, favorites, search, custom } = req.query;
   
-  let query = 'SELECT * FROM recipes WHERE 1=1';
+  let query = 'SELECT id, name, description, cuisine, duration, servings, equipment, highlight_image, image, custom, source, created_at FROM recipes WHERE 1=1';
   const params = [];
 
   if (cuisine && cuisine !== 'all') {
@@ -149,8 +149,8 @@ app.get('/api/recipes', (req, res) => {
   }
 
   if (search) {
-    query += ' AND (name LIKE ? OR description LIKE ? OR ingredients LIKE ?)';
-    params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+    query += ' AND (name LIKE ? OR description LIKE ?)';
+    params.push(`%${search}%`, `%${search}%`);
   }
 
   if (custom === 'true') {
@@ -172,16 +172,19 @@ app.get('/api/recipes', (req, res) => {
   const favIds = db.prepare('SELECT recipe_id FROM favorites').all().map(f => f.recipe_id);
   
   recipes = recipes.map(r => ({
-    ...r,
-    ingredients: JSON.parse(r.ingredients),
-    instructions: JSON.parse(r.instructions),
+    id: r.id,
+    name: r.name,
+    description: r.description,
+    cuisine: r.cuisine,
+    duration: r.duration,
+    servings: r.servings,
     equipment: r.equipment ? JSON.parse(r.equipment) : [],
-    seasonal: r.seasonal ? JSON.parse(r.seasonal) : [],
-    images: r.images ? JSON.parse(r.images) : [],
     highlight_image: r.highlight_image,
+    image: r.image, // Keep for backward compatibility
     isFavorite: favIds.includes(r.id),
     isCustom: r.custom === 1,
-    source: r.source || 'onegai'
+    source: r.source || 'onegai',
+    created_at: r.created_at
   }));
 
   if (favorites === 'true') {
