@@ -46,13 +46,24 @@ body.standalone-mode {
   padding-top: max(env(safe-area-inset-top, 0), 44px);
 }
 
-body.standalone-mode .modal-body-scroll {
-  padding-bottom: calc(6rem + env(safe-area-inset-bottom, 20px));
+body.standalone-mode .modal-header-fixed {
+  padding-top: calc(1.5rem + env(safe-area-inset-top, 20px));
 }
 
-body.standalone-mode .modal-actions {
+body.standalone-mode .modal-actions,
+body.standalone-mode .modal-actions-fixed {
   padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 20px));
-  min-height: calc(5rem + env(safe-area-inset-bottom, 20px));
+}
+
+@media (display-mode: standalone) {
+  .modal-header-fixed {
+    padding-top: calc(1.5rem + env(safe-area-inset-top, 20px));
+  }
+  
+  .modal-actions,
+  .modal-actions-fixed {
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 20px));
+  }
 }
 
 body.modal-open {
@@ -333,6 +344,17 @@ select:focus, #search:focus {
   color: #0c1015;
 }
 
+.modal-header-fixed {
+  padding: 1.5rem;
+  padding-top: calc(1.5rem + env(safe-area-inset-top, 0));
+  background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+  color: #0c1015;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
 .modal-header h2 {
   font-size: 1.5rem;
   margin-bottom: 0.5rem;
@@ -365,21 +387,33 @@ select:focus, #search:focus {
 }
 
 .modal-body-scroll {
-  padding: 1.5rem 1.5rem 5rem 1.5rem;
+  padding: 1.5rem;
+  padding-left: calc(1.5rem + env(safe-area-inset-left, 0));
+  padding-right: calc(1.5rem + env(safe-area-inset-right, 0));
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  max-height: calc(100vh - 200px);
-  max-height: calc(var(--actual-vh, 100vh) - 200px);
-  max-height: calc(100dvh - 200px);
   overscroll-behavior: contain;
+  min-height: 0;
 }
 
-/* Extra bottom padding for standalone mode */
-@media (display-mode: standalone) {
-  .modal-body-scroll {
-    padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0));
-  }
+.modal-actions-fixed {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  padding-left: calc(1.5rem + env(safe-area-inset-left, 0));
+  padding-right: calc(1.5rem + env(safe-area-inset-right, 0));
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0));
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+  background: var(--surface);
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+}
+
+.modal-actions-fixed .btn {
+  flex: 1;
 }
 
 .modal-section {
@@ -1170,13 +1204,12 @@ select:focus, #search:focus {
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
-  /* Standalone mode adjustments */
-  @media (display-mode: standalone) {
-    .modal-content {
-      height: calc(100vh - env(safe-area-inset-top, 0));
-      height: calc(var(--actual-vh, 100vh) - env(safe-area-inset-top, 0));
-      height: calc(100dvh - env(safe-area-inset-top, 0));
-    }
+  .modal-header-fixed {
+    flex-shrink: 0;
+  }
+
+  .modal-actions-fixed {
+    flex-shrink: 0;
   }
 
   .modal-header {
@@ -1197,23 +1230,30 @@ select:focus, #search:focus {
     touch-action: pan-y;
   }
 
-  .modal-actions {
+  .modal-header-fixed {
     padding: 1rem;
-    padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+    padding-top: calc(1rem + env(safe-area-inset-top, 0));
+    padding-left: calc(1rem + env(safe-area-inset-left, 0));
+    padding-right: calc(1rem + env(safe-area-inset-right, 0));
+  }
+
+  .modal-body-scroll {
+    padding: 1rem;
+    padding-left: calc(1rem + env(safe-area-inset-left, 0));
+    padding-right: calc(1rem + env(safe-area-inset-right, 0));
+  }
+
+  .modal-actions,
+  .modal-actions-fixed {
+    padding: 1rem;
+    padding-left: calc(1rem + env(safe-area-inset-left, 0));
+    padding-right: calc(1rem + env(safe-area-inset-right, 0));
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0));
     flex-shrink: 0;
     position: sticky;
     bottom: 0;
     background: var(--surface);
     border-top: 1px solid var(--border);
-    min-height: calc(4rem + env(safe-area-inset-bottom, 0px));
-  }
-
-  /* Enhanced safe area handling for standalone mode */
-  @media (display-mode: standalone) {
-    .modal-actions {
-      padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 20px));
-      min-height: calc(5rem + env(safe-area-inset-bottom, 20px));
-    }
   }
 
   .modal-actions {

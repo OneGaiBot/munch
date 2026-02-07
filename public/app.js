@@ -173,7 +173,7 @@ async function openRecipe(id) {
   baseServings = recipe.servings;
 
   modalBody.innerHTML = `
-    <div class="modal-header">
+    <div class="modal-header-fixed">
       <h2>${recipe.name}</h2>
       <p>${recipe.description}</p>
       <div class="modal-meta">
@@ -216,7 +216,7 @@ async function openRecipe(id) {
         <button class="btn btn-secondary save-comments-btn" onclick="saveComments(${recipe.id})" style="margin-top: 0.5rem;">💾 Save Notes</button>
       </div>
     </div>
-    <div class="modal-actions">
+    <div class="modal-actions-fixed">
       <button class="btn btn-heart ${recipe.isFavorite ? 'active' : ''}" onclick="toggleFavoriteModal(${recipe.id})">
         ${recipe.isFavorite ? '❤️ Saved' : '🤍 Save'}
       </button>
