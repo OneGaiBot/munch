@@ -173,7 +173,7 @@ async function openRecipe(id) {
   baseServings = recipe.servings;
 
   modalBody.innerHTML = `
-    <div class="modal-header-fixed">
+    <div class="recipe-header">
       <h2>${recipe.name}</h2>
       <p>${recipe.description}</p>
       <div class="modal-meta">
@@ -184,7 +184,8 @@ async function openRecipe(id) {
       </div>
       ${recipe.source_url ? `<p class="source-link">Source: <a href="${recipe.source_url}" target="_blank" rel="noopener">${getDomain(recipe.source_url)}</a></p>` : ''}
     </div>
-    <div class="modal-body-scroll">
+    
+    <div class="recipe-content">
       <div class="modal-section">
         <h3>Servings</h3>
         <div class="servings-control">
@@ -216,7 +217,8 @@ async function openRecipe(id) {
         <button class="btn btn-secondary save-comments-btn" onclick="saveComments(${recipe.id})" style="margin-top: 0.5rem;">💾 Save Notes</button>
       </div>
     </div>
-    <div class="modal-actions-fixed">
+    
+    <div class="recipe-actions">
       <button class="btn btn-heart ${recipe.isFavorite ? 'active' : ''}" onclick="toggleFavoriteModal(${recipe.id})">
         ${recipe.isFavorite ? '❤️ Saved' : '🤍 Save'}
       </button>
@@ -232,17 +234,6 @@ async function openRecipe(id) {
   
   modal.classList.remove('hidden');
   document.body.classList.add('modal-open');
-  
-  // Handle iOS Safari viewport height changes
-  updateModalHeight();
-  
-  // Prevent scrolling background when modal is open
-  const modalBodyScroll = document.querySelector('.modal-body-scroll');
-  if (modalBodyScroll) {
-    modalBodyScroll.addEventListener('touchmove', (e) => {
-      e.stopPropagation();
-    }, { passive: true });
-  }
 }
 
 // Adjust servings
@@ -472,17 +463,6 @@ function openAddRecipeModal() {
   addRecipeForm.reset();
   addRecipeModal.classList.remove('hidden');
   document.body.classList.add('modal-open');
-  
-  // Handle iOS Safari viewport height changes
-  updateModalHeight();
-  
-  // Prevent scrolling background when modal is open
-  const modalBodyScroll = addRecipeModal.querySelector('.modal-body-scroll');
-  if (modalBodyScroll) {
-    modalBodyScroll.addEventListener('touchmove', (e) => {
-      e.stopPropagation();
-    }, { passive: true });
-  }
 }
 
 function closeAddRecipeModal() {

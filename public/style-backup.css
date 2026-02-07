@@ -286,7 +286,7 @@ select:focus, #search:focus {
   border: 1px solid var(--accent);
 }
 
-/* Modal - Simple and Robust */
+/* Modal */
 .modal {
   position: fixed;
   inset: 0;
@@ -296,6 +296,9 @@ select:focus, #search:focus {
   justify-content: center;
   padding: 1rem;
   z-index: 100;
+  overflow-y: auto;
+  touch-action: manipulation;
+  overscroll-behavior: contain;
 }
 
 .modal.hidden {
@@ -319,15 +322,17 @@ select:focus, #search:focus {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  width: 44px;
-  height: 44px;
+  top: calc(1rem + env(safe-area-inset-top, 0));
+  right: calc(1rem + env(safe-area-inset-right, 0));
+  width: 36px;
+  height: 36px;
   background: rgba(0,0,0,0.4);
   border: none;
   border-radius: 50%;
   font-size: 1.5rem;
   color: var(--text);
   cursor: pointer;
-  z-index: 200;
+  z-index: 20;
   transition: background 0.2s;
 }
 
@@ -335,40 +340,31 @@ select:focus, #search:focus {
   background: rgba(0,0,0,0.6);
 }
 
-/* Recipe Modal Parts */
-.recipe-header {
-  padding: 1.5rem;
-  background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
-  color: #0c1015;
-  flex-shrink: 0;
+@media (display-mode: standalone) {
+  .modal-close {
+    top: calc(1.5rem + env(safe-area-inset-top, 20px));
+  }
 }
 
-.recipe-content {
-  padding: 1.5rem;
-  flex: 1;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+body.standalone-mode .modal-close {
+  top: calc(1.5rem + env(safe-area-inset-top, 20px));
 }
 
-.recipe-actions {
-  display: flex;
-  gap: 0.75rem;
-  padding: 1rem 1.5rem;
-  padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0));
-  border-top: 1px solid var(--border);
-  flex-shrink: 0;
-  background: var(--surface);
-}
-
-.recipe-actions .btn {
-  flex: 1;
-}
-
-/* Legacy modal classes for compatibility */
 .modal-header {
   padding: 1.5rem;
   background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
   color: #0c1015;
+}
+
+.modal-header-fixed {
+  padding: 1.5rem;
+  padding-top: calc(1.5rem + env(safe-area-inset-top, 0));
+  background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+  color: #0c1015;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  flex-shrink: 0;
 }
 
 .modal-header h2 {
@@ -1192,55 +1188,6 @@ select:focus, #search:focus {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-
-  /* Mobile Modal */
-  .modal {
-    padding: 0;
-    align-items: stretch;
-  }
-
-  .modal-content {
-    border-radius: 0;
-    max-height: 100vh;
-    height: 100vh;
-    max-width: 100%;
-    margin: 0;
-  }
-
-  .recipe-header {
-    padding: 1rem;
-    padding-top: calc(1rem + env(safe-area-inset-top, 0));
-  }
-
-  .recipe-content {
-    padding: 1rem;
-  }
-
-  .recipe-actions {
-    padding: 1rem;
-    padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0));
-  }
-
-  .modal-close {
-    top: calc(1rem + env(safe-area-inset-top, 0));
-    right: calc(1rem + env(safe-area-inset-right, 0));
-  }
-}
-
-/* PWA Mobile */
-@media (display-mode: standalone) and (max-width: 600px) {
-  .recipe-header {
-    padding-top: calc(1.5rem + env(safe-area-inset-top, 20px));
-  }
-
-  .recipe-actions {
-    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 20px));
-  }
-
-  .modal-close {
-    top: calc(1.5rem + env(safe-area-inset-top, 20px));
-  }
-}
 
   /* Full-screen modal on mobile */
   .modal {
