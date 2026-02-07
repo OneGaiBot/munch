@@ -287,47 +287,34 @@ select:focus, #search:focus {
   border: 1px solid var(--accent);
 }
 
-/* Modal Overlay - Best Practices */
+/* Simple Full-Screen Modal */
 .modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   background: rgba(0, 0, 0, 0.8);
   z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-  box-sizing: border-box;
 }
 
 .modal.hidden {
   display: none;
 }
 
-/* Modal Container */
 .modal-content {
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  margin: 0 auto;
-  max-width: 600px;
-  width: 100%;
-  height: 80vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   position: relative;
 }
 
-/* Close Button */
 .modal-close {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  width: 40px;
-  height: 40px;
+  top: max(1rem, env(safe-area-inset-top));
+  right: max(1rem, env(safe-area-inset-right));
+  width: 44px;
+  height: 44px;
   background: rgba(0, 0, 0, 0.5);
   border: none;
   border-radius: 50%;
@@ -335,35 +322,28 @@ select:focus, #search:focus {
   font-size: 1.5rem;
   cursor: pointer;
   z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-/* Recipe Header */
 .recipe-header {
   background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
   color: #0c1015;
-  padding: 1.5rem;
-  border-radius: 12px 12px 0 0;
+  padding: 1rem;
+  padding-top: max(1rem, env(safe-area-inset-top));
   flex-shrink: 0;
 }
 
-/* Recipe Content - Scrollable */
 .recipe-content {
   flex: 1;
-  min-height: 0;
   overflow-y: auto;
-  padding: 1.5rem;
+  padding: 1rem;
   -webkit-overflow-scrolling: touch;
 }
 
-/* Recipe Actions */
 .recipe-actions {
-  padding: 1rem 1.5rem;
+  padding: 1rem;
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
   border-top: 1px solid var(--border);
   background: var(--surface);
-  border-radius: 0 0 12px 12px;
   display: flex;
   gap: 0.75rem;
   flex-shrink: 0;
@@ -371,47 +351,6 @@ select:focus, #search:focus {
 
 .recipe-actions .btn {
   flex: 1;
-}
-
-/* Mobile Styles */
-@media (max-width: 600px) {
-  .modal {
-    padding: 0;
-    align-items: stretch;
-    justify-content: stretch;
-  }
-  
-  .modal-content {
-    height: 100vh;
-    border-radius: 0;
-    margin: 0;
-  }
-  
-  .recipe-header {
-    border-radius: 0;
-    padding: 1rem;
-    padding-top: max(1rem, env(safe-area-inset-top));
-    flex-shrink: 0;
-  }
-  
-  .recipe-content {
-    padding: 1rem;
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-  }
-  
-  .recipe-actions {
-    border-radius: 0;
-    padding: 1rem;
-    padding-bottom: max(1rem, env(safe-area-inset-bottom));
-    flex-shrink: 0;
-  }
-  
-  .modal-close {
-    top: max(1rem, env(safe-area-inset-top));
-    right: max(1rem, env(safe-area-inset-right));
-  }
 }
 
 .modal-header h2 {
