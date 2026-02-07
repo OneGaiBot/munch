@@ -1,0 +1,24 @@
+{
+  "name": "Munch - What's for dinner?",
+  "short_name": "Munch",
+  "description": "Recipe app with favorites and shopping list",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0c1015",
+  "theme_color": "#2dd4bf",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9IiMwYzEwMTUiLz4KPHN0eWxlPgoudGV4dCB7IGZpbGw6ICMyZGQ0YmY7IGZvbnQtc2l6ZTogODBweDsgZm9udC1mYW1pbHk6IHNhbnMtc2VyaWY7IH0KPC9zdHlsZT4KPHRleHQgeD0iOTYiIHk9IjEzMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgY2xhc3M9InRleHQiPvCfjaQ8L3RleHQ+Cjwvc3ZnPgo=",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iNjQiIGZpbGw9IiMwYzEwMTUiLz4KPHN0eWxlPgoudGV4dCB7IGZpbGw6ICMyZGQ0YmY7IGZvbnQtc2l6ZTogMjAwcHg7IGZvbnQtZmFtaWx5OiBzYW5zLXNlcmlmOyB9Cjwvc3R5bGU+Cjx0ZXh0IHg9IjI1NiIgeT0iMzQwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBjbGFzcz0idGV4dCI+8J+NpDwvdGV4dD4KPC9zdmc+Cg==",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

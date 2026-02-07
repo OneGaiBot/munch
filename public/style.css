@@ -30,6 +30,29 @@ body {
   color: var(--text);
   min-height: 100vh;
   overflow-x: hidden;
+  /* Safe area for PWA/standalone mode */
+  padding-top: env(safe-area-inset-top, 0);
+}
+
+/* Additional top padding for standalone mode (PWA) */
+@media (display-mode: standalone) {
+  body {
+    padding-top: max(env(safe-area-inset-top, 0), 44px);
+  }
+}
+
+/* JavaScript-detected standalone mode */
+body.standalone-mode {
+  padding-top: max(env(safe-area-inset-top, 0), 44px);
+}
+
+body.standalone-mode .modal-body-scroll {
+  padding-bottom: calc(6rem + env(safe-area-inset-bottom, 20px));
+}
+
+body.standalone-mode .modal-actions {
+  padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 20px));
+  min-height: calc(5rem + env(safe-area-inset-bottom, 20px));
 }
 
 body.modal-open {
@@ -40,6 +63,8 @@ body.modal-open {
   max-width: 1200px;
   margin: 0 auto;
   padding: 1rem;
+  padding-left: max(1rem, env(safe-area-inset-left, 0));
+  padding-right: max(1rem, env(safe-area-inset-right, 0));
 }
 
 header {
@@ -348,6 +373,13 @@ select:focus, #search:focus {
   max-height: calc(var(--actual-vh, 100vh) - 200px);
   max-height: calc(100dvh - 200px);
   overscroll-behavior: contain;
+}
+
+/* Extra bottom padding for standalone mode */
+@media (display-mode: standalone) {
+  .modal-body-scroll {
+    padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0));
+  }
 }
 
 .modal-section {
@@ -1138,6 +1170,15 @@ select:focus, #search:focus {
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
+  /* Standalone mode adjustments */
+  @media (display-mode: standalone) {
+    .modal-content {
+      height: calc(100vh - env(safe-area-inset-top, 0));
+      height: calc(var(--actual-vh, 100vh) - env(safe-area-inset-top, 0));
+      height: calc(100dvh - env(safe-area-inset-top, 0));
+    }
+  }
+
   .modal-header {
     flex-shrink: 0;
   }
@@ -1165,6 +1206,14 @@ select:focus, #search:focus {
     background: var(--surface);
     border-top: 1px solid var(--border);
     min-height: calc(4rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Enhanced safe area handling for standalone mode */
+  @media (display-mode: standalone) {
+    .modal-actions {
+      padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 20px));
+      min-height: calc(5rem + env(safe-area-inset-bottom, 20px));
+    }
   }
 
   .modal-actions {
