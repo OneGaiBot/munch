@@ -1,6 +1,8 @@
 const express = require('express');
 const Database = require('better-sqlite3');
+const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const PORT = 3002;
@@ -55,16 +57,74 @@ try {
 try {
   db.exec(`ALTER TABLE recipes ADD COLUMN comments TEXT`);
 } catch (e) { /* column exists */ }
+try {
+  db.exec(`ALTER TABLE recipes ADD COLUMN images TEXT`);
+} catch (e) { /* column exists */ }
+try {
+  db.exec(`ALTER TABLE recipes ADD COLUMN highlight_image TEXT`);
+} catch (e) { /* column exists */ }
 
 // Set source for existing recipes
 db.exec(`UPDATE recipes SET source = 'onegai' WHERE source IS NULL AND custom = 0`);
 db.exec(`UPDATE recipes SET source = 'user' WHERE custom = 1 AND source IS NULL`);
+
+// File upload configuration
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = path.join(__dirname, 'public', 'uploads');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ 
+  storage: storage,
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed!'), false);
+    }
+  },
+  limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
+});
 
 // Middleware
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // API Routes
+
+// Upload images for recipe
+app.post('/api/upload', upload.array('images', 10), (req, res) => {
+  try {
+    const imagePaths = req.files.map(file => `/uploads/${file.filename}`);
+    res.json({ images: imagePaths });
+  } catch (error) {
+    res.status(500).json({ error: 'File upload failed' });
+  }
+});
+
+// Update recipe images and highlight
+app.patch('/api/recipes/:id/images', (req, res) => {
+  const { id } = req.params;
+  const { images, highlight_image } = req.body;
+  
+  if (images !== null && images !== undefined && !Array.isArray(images)) {
+    return res.status(400).json({ error: 'Images must be an array' });
+  }
+  
+  db.prepare('UPDATE recipes SET images = ?, highlight_image = ? WHERE id = ?')
+    .run(images ? JSON.stringify(images) : null, highlight_image || null, id);
+  
+  res.json({ ok: true });
+});
 
 // Get all recipes with optional filters
 app.get('/api/recipes', (req, res) => {
@@ -117,6 +177,8 @@ app.get('/api/recipes', (req, res) => {
     instructions: JSON.parse(r.instructions),
     equipment: r.equipment ? JSON.parse(r.equipment) : [],
     seasonal: r.seasonal ? JSON.parse(r.seasonal) : [],
+    images: r.images ? JSON.parse(r.images) : [],
+    highlight_image: r.highlight_image,
     isFavorite: favIds.includes(r.id),
     isCustom: r.custom === 1,
     source: r.source || 'onegai'
@@ -144,6 +206,8 @@ app.get('/api/recipes/:id', (req, res) => {
     instructions: JSON.parse(recipe.instructions),
     equipment: recipe.equipment ? JSON.parse(recipe.equipment) : [],
     seasonal: recipe.seasonal ? JSON.parse(recipe.seasonal) : [],
+    images: recipe.images ? JSON.parse(recipe.images) : [],
+    highlight_image: recipe.highlight_image,
     isFavorite: !!isFavorite,
     isCustom: recipe.custom === 1,
     source: recipe.source || 'onegai'

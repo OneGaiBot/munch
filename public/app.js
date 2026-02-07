@@ -118,15 +118,33 @@ function renderRecipes(container = recipeGrid, data = recipes) {
     return;
   }
 
-  container.innerHTML = data.map(r => `
+  container.innerHTML = data.map(r => {
+    // Use highlight_image, or first image, or fallback to old image field, or show emoji
+    const displayImage = r.highlight_image || 
+                         (r.images && r.images.length > 0 ? r.images[0] : null) || 
+                         r.image;
+    
+    return `
     <div class="recipe-card" data-id="${r.id}">
-      <div class="card-image" ${r.image ? `style="background-image: url('${r.image}'); background-size: cover; background-position: center;"` : ''}>
-        ${r.image ? '' : cuisineEmoji[r.cuisine] || '🍽️'}
+      <div class="card-image" ${displayImage ? `style="background-image: url('${displayImage}'); background-size: cover; background-position: center;"` : ''}>
+        ${displayImage ? '' : cuisineEmoji[r.cuisine] || '🍽️'}
         <span class="source-badge ${r.source}">${sourceBadge[r.source] || '🍽️'}</span>
         <button class="card-favorite ${r.isFavorite ? 'active' : ''}" onclick="toggleFavorite(event, ${r.id})">
           ${r.isFavorite ? '❤️' : '🤍'}
         </button>
       </div>
+      <div class="card-body">
+        <h3 class="card-title">${r.name}</h3>
+        <p class="card-description">${r.description}</p>
+        <div class="card-meta">
+          <span class="time">⏱️ ${r.duration} min</span>
+          <span class="tag cuisine">${r.cuisine}</span>
+          ${(r.equipment || []).map(eq => `<span class="tag equipment">${equipmentEmoji[eq] || '🍳'} ${eq}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+    `;
+  }
       <div class="card-body">
         <h3 class="card-title">${r.name}</h3>
         <p class="card-description">${r.description}</p>
@@ -186,6 +204,18 @@ async function openRecipe(id) {
     </div>
     
     <div class="recipe-content">
+      ${recipe.images && recipe.images.length > 0 ? `
+        <div class="modal-section">
+          <h3>Images</h3>
+          <div class="recipe-images-grid">
+            ${recipe.images.map(img => `
+              <div class="recipe-image-item" onclick="openImageModal('${img}')">
+                <img src="${img}" alt="Recipe image" loading="lazy">
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
       <div class="modal-section">
         <h3>Servings</h3>
         <div class="servings-control">
@@ -468,6 +498,11 @@ function openAddRecipeModal() {
 function closeAddRecipeModal() {
   addRecipeModal.classList.add('hidden');
   document.body.classList.remove('modal-open');
+  // Clear image state
+  selectedImages = [];
+  highlightImageIndex = -1;
+  const preview = document.getElementById('image-preview');
+  if (preview) preview.innerHTML = '';
 }
 
 addRecipeModal.addEventListener('click', (e) => {
@@ -507,6 +542,9 @@ addRecipeForm.addEventListener('submit', async (e) => {
   }
   
   try {
+    // First upload images if any
+    const { images, highlightImage } = await uploadImages();
+    
     const res = await fetch('/api/recipes', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -524,7 +562,21 @@ addRecipeForm.addEventListener('submit', async (e) => {
     });
     
     if (res.ok) {
+      const recipe = await res.json();
+      
+      // If we have images, update the recipe with them
+      if (images.length > 0) {
+        await fetch(`/api/recipes/${recipe.id}/images`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ images, highlight_image: highlightImage })
+        });
+      }
+      
       closeAddRecipeModal();
+      // Clear form state
+      selectedImages = [];
+      highlightImageIndex = -1;
       // Switch to My Recipes tab
       document.querySelector('[data-tab="myrecipes"]').click();
     } else {
@@ -536,6 +588,104 @@ addRecipeForm.addEventListener('submit', async (e) => {
     console.error(err);
   }
 });
+
+// Image handling for add recipe form
+let selectedImages = [];
+let highlightImageIndex = -1;
+
+document.getElementById('recipe-images')?.addEventListener('change', handleImageSelection);
+
+function handleImageSelection(e) {
+  const files = Array.from(e.target.files);
+  const preview = document.getElementById('image-preview');
+  
+  files.forEach(file => {
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        selectedImages.push({
+          file: file,
+          dataUrl: event.target.result,
+          uploaded: false,
+          path: null
+        });
+        renderImagePreview();
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+}
+
+function renderImagePreview() {
+  const preview = document.getElementById('image-preview');
+  if (!preview) return;
+  
+  preview.innerHTML = selectedImages.map((img, index) => `
+    <div class="image-preview-item ${index === highlightImageIndex ? 'highlight' : ''}">
+      <img src="${img.dataUrl}" alt="Preview ${index + 1}">
+      <div class="image-preview-controls">
+        <button type="button" class="image-btn highlight-btn ${index === highlightImageIndex ? 'active' : ''}" 
+                onclick="setHighlightImage(${index})" title="Set as highlight">⭐</button>
+        <button type="button" class="image-btn delete-btn" 
+                onclick="removeImage(${index})" title="Remove">×</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function setHighlightImage(index) {
+  highlightImageIndex = index === highlightImageIndex ? -1 : index;
+  renderImagePreview();
+}
+
+function removeImage(index) {
+  selectedImages.splice(index, 1);
+  if (highlightImageIndex === index) {
+    highlightImageIndex = -1;
+  } else if (highlightImageIndex > index) {
+    highlightImageIndex--;
+  }
+  renderImagePreview();
+}
+
+async function uploadImages() {
+  if (selectedImages.length === 0) return { images: [], highlightImage: null };
+  
+  const formData = new FormData();
+  selectedImages.forEach(img => {
+    if (!img.uploaded) {
+      formData.append('images', img.file);
+    }
+  });
+  
+  if (formData.has('images')) {
+    const res = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData
+    });
+    
+    if (!res.ok) {
+      throw new Error('Failed to upload images');
+    }
+    
+    const { images } = await res.json();
+    
+    // Update selectedImages with uploaded paths
+    let uploadIndex = 0;
+    selectedImages.forEach(img => {
+      if (!img.uploaded) {
+        img.path = images[uploadIndex];
+        img.uploaded = true;
+        uploadIndex++;
+      }
+    });
+  }
+  
+  const imagePaths = selectedImages.map(img => img.path);
+  const highlightImage = highlightImageIndex >= 0 ? selectedImages[highlightImageIndex].path : null;
+  
+  return { images: imagePaths, highlightImage };
+}
 
 // Shuffle mode
 let shuffleRecipes = [];
@@ -731,6 +881,26 @@ function updateModalHeight() {
 
 if (window.visualViewport) {
   window.visualViewport.addEventListener('resize', updateModalHeight);
+}
+
+// Image modal for viewing full size
+function openImageModal(imageSrc) {
+  const imageModal = document.createElement('div');
+  imageModal.className = 'modal';
+  imageModal.innerHTML = `
+    <div class="modal-content" style="max-width: 90vw; max-height: 90vh; background: transparent; border: none;">
+      <button class="modal-close" onclick="this.parentElement.parentElement.remove()">&times;</button>
+      <img src="${imageSrc}" style="max-width: 100%; max-height: 100%; object-fit: contain;" alt="Recipe image">
+    </div>
+  `;
+  
+  imageModal.addEventListener('click', (e) => {
+    if (e.target === imageModal) {
+      imageModal.remove();
+    }
+  });
+  
+  document.body.appendChild(imageModal);
 }
 
 // Refresh app data
