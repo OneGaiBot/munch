@@ -302,8 +302,12 @@ select:focus, #search:focus {
 .modal-content {
   background: var(--surface);
   height: 100vh;
+  height: var(--actual-vh, 100vh); /* JS fallback */
+  height: 100dvh; /* Dynamic viewport for iOS Safari */
   width: 100%;
   max-height: 100vh;
+  max-height: var(--actual-vh, 100vh);
+  max-height: 100dvh;
   position: relative;
   border: 3px solid red; /* DEBUG: see modal bounds */
 }
@@ -312,6 +316,8 @@ select:focus, #search:focus {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  height: var(--actual-vh, 100vh); /* JS fallback */
+  height: 100dvh; /* Dynamic viewport for iOS Safari */
 }
 
 .modal-close {

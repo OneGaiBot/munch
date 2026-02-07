@@ -723,8 +723,19 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// Handle iOS Safari viewport for modal
+function updateModalHeight() {
+  const height = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+  document.documentElement.style.setProperty('--actual-vh', `${height}px`);
+}
+
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', updateModalHeight);
+}
+
 // Init
 document.addEventListener('DOMContentLoaded', () => {
+  updateModalHeight();
   loadCuisines();
   fetchRecipes();
 });
