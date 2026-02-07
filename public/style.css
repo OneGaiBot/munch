@@ -82,22 +82,23 @@ body.modal-open {
 header {
   text-align: center;
   padding: 2rem 0;
+  position: relative;
 }
 
 .header-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   max-width: 1200px;
   margin: 0 auto;
   position: relative;
 }
 
 .header-text {
-  flex: 1;
+  /* Stays centered */
 }
 
 .refresh-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
   background: transparent;
   border: 2px solid var(--border);
   border-radius: 50%;
@@ -110,7 +111,6 @@ header {
   color: var(--text-muted);
   font-size: 1.2rem;
   transition: all 0.2s ease;
-  flex-shrink: 0;
 }
 
 .refresh-btn:hover {
@@ -1209,7 +1209,7 @@ select:focus, #search:focus {
   }
   
   .refresh-btn {
-    margin-left: 1rem;
+    right: 0.5rem; /* Account for mobile padding */
   }
 
   header h1 {
