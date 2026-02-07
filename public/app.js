@@ -723,51 +723,8 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// Handle iOS Safari viewport changes
-function updateModalHeight() {
-  let height;
-  if (window.visualViewport) {
-    height = window.visualViewport.height;
-  } else {
-    height = window.innerHeight;
-  }
-  
-  // Account for standalone mode (PWA)
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
-                       window.navigator.standalone ||
-                       document.referrer.includes('android-app://');
-  
-  if (isStandalone) {
-    // In standalone mode, account for safe areas
-    const safeAreaTop = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-top)')) || 0;
-    const safeAreaBottom = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-bottom)')) || 0;
-    height = height - safeAreaTop - safeAreaBottom;
-  }
-  
-  document.documentElement.style.setProperty('--actual-vh', `${height}px`);
-}
-
-// Listen for viewport changes (Safari address bar)
-if (window.visualViewport) {
-  window.visualViewport.addEventListener('resize', updateModalHeight);
-}
-window.addEventListener('resize', updateModalHeight);
-
-// Detect standalone mode
-function detectStandaloneMode() {
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
-                       window.navigator.standalone ||
-                       document.referrer.includes('android-app://');
-  
-  if (isStandalone) {
-    document.body.classList.add('standalone-mode');
-  }
-}
-
 // Init
 document.addEventListener('DOMContentLoaded', () => {
-  detectStandaloneMode();
-  updateModalHeight();
   loadCuisines();
   fetchRecipes();
 });

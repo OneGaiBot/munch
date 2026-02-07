@@ -135,10 +135,10 @@
     <div id="add-recipe-modal" class="modal hidden">
       <div class="modal-content add-recipe-form">
         <button class="modal-close" onclick="closeAddRecipeModal()">&times;</button>
-        <div class="modal-header-fixed">
+        <div class="recipe-header">
           <h2>Add Recipe</h2>
         </div>
-        <div class="modal-body-scroll">
+        <div class="recipe-content">
           <form id="add-recipe-form">
           <div class="form-group">
             <label for="recipe-name">Name *</label>
@@ -209,7 +209,7 @@
           
           </form>
         </div>
-        <div class="modal-actions-fixed">
+        <div class="recipe-actions">
           <button type="button" class="btn btn-secondary" onclick="closeAddRecipeModal()">Cancel</button>
           <button type="submit" class="btn btn-primary" onclick="document.getElementById('add-recipe-form').requestSubmit()">Save Recipe</button>
         </div>
