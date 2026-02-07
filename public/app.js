@@ -733,6 +733,29 @@ if (window.visualViewport) {
   window.visualViewport.addEventListener('resize', updateModalHeight);
 }
 
+// Refresh app data
+function refreshApp() {
+  const btn = document.querySelector('.refresh-btn');
+  
+  // Add spinning animation
+  btn.classList.add('spinning');
+  
+  // Refresh all data
+  Promise.all([
+    loadCuisines(),
+    fetchRecipes()
+  ]).then(() => {
+    // Remove animation after a short delay
+    setTimeout(() => {
+      btn.classList.remove('spinning');
+    }, 800);
+  }).catch(() => {
+    setTimeout(() => {
+      btn.classList.remove('spinning');
+    }, 800);
+  });
+}
+
 // Init
 document.addEventListener('DOMContentLoaded', () => {
   updateModalHeight();
