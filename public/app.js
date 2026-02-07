@@ -143,18 +143,7 @@ function renderRecipes(container = recipeGrid, data = recipes) {
       </div>
     </div>
     `;
-  }
-      <div class="card-body">
-        <h3 class="card-title">${r.name}</h3>
-        <p class="card-description">${r.description}</p>
-        <div class="card-meta">
-          <span class="time">⏱️ ${r.duration} min</span>
-          <span class="tag cuisine">${r.cuisine}</span>
-          ${(r.equipment || []).map(eq => `<span class="tag equipment">${equipmentEmoji[eq] || '🍳'} ${eq}</span>`).join('')}
-        </div>
-      </div>
-    </div>
-  `).join('');
+  }).join('');
 
   // Add click handlers and lazy loading
   container.querySelectorAll('.recipe-card').forEach(card => {
